@@ -3,6 +3,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-namespace graph {
+struct graph {
   vector<set<int, >> adj;
 }
