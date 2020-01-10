@@ -22,6 +22,8 @@ struct pt {
     return cp(a-o, b-o);
   }
   // is angle ABC > pi?
-  friend bool reflex(const pt& a, const pt& b, const pt& c) {
+  // TODO
+  friend bool isreflex(const pt& a, const pt& b, const pt& c) {
+    return false;
   }
 };

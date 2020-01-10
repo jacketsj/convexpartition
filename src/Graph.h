@@ -18,7 +18,7 @@ struct graph {
   vector<set<int, pt_cmp>> adj;
 
   void add_vertex(pt p) {
-    assert(p.i == points.size());
+    assert(p.i == (int)points.size());
     points.push_back(p);
     adj.emplace_back(p, points);
   }
@@ -43,13 +43,13 @@ struct graph {
     for(int i=0;i<n;i++) {
       int id, x, y;
       in >> id >> x >> y;
-      add_vertex(id, x, y);
+      add_vertex({id, x, y});
     }
     for(int i=0;i<n;i++) {
-      int ki, u;
+      int ki, a;
       in >> ki;
       for(int j=0;j<ki;j++) {
-        cin >> a;
+        in >> a;
         add_edge(i, a);
       }
     }

@@ -1,11 +1,11 @@
 #include <bits/stdc++.h>
 using namespace std;
 #include "Graph.h"
-#include "extern/delaunator.h"
+#include "extern/delaunator.hpp"
 
 void delaunate(graph& g) {
   vector<double> dinput;
-  for(auto &p: g.points) {
+  for(pt &p: g.points) {
     dinput.push_back(p.x);
     dinput.push_back(p.y);
   }
