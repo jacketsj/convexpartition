@@ -5,6 +5,7 @@
 using namespace std;
 
 struct graph {
+  int n;
   vector<pt> points;
   struct pt_cmp {
     pt o;
@@ -15,9 +16,56 @@ struct graph {
     }
   };
   vector<set<int, pt_cmp>> adj;
-  void add_vertex(pt i) {
-    assert(i.i == points.size());
-    points.push_back(i);
-    adj.emplace_back(i, points);
+
+  void add_vertex(pt p) {
+    assert(p.i == points.size());
+    points.push_back(p);
+    adj.emplace_back(p, points);
+  }
+  void add_edge(int i, int j) {
+    adj[i].insert(j);
+    adj[j].insert(i);
+  }
+  void remove_edge(int i, int j) {
+    adj[i].erase(j);
+    adj[j].erase(i);
+  }
+
+  void reset() {
+    n = 0;
+    points.clear();
+    adj.clear();
+  }
+  void read(string filename) { // clear graph and read in new graph
+    reset();
+    ifstream in(filename);
+    in >> n;
+    for(int i=0;i<n;i++) {
+      int id, x, y;
+      in >> id >> x >> y;
+      add_vertex(id, x, y);
+    }
+    for(int i=0;i<n;i++) {
+      int ki, u;
+      in >> ki;
+      for(int j=0;j<ki;j++) {
+        cin >> a;
+        add_edge(i, a);
+      }
+    }
+  }
+  void write(string filename) {
+    ofstream out(filename);
+    out << n << '\n';
+    for(int i=0;i<n;i++) {
+      out << points[i].i << " " << points[i].x << " " << points[i].y << '\n';
+    }
+    for(int i=0;i<n;i++) {
+      out << adj[i].size() << " ";
+      for(int j: adj[i]) {
+        out << j << " ";
+      }
+      cout << '\n';
+    }
   }
 };
