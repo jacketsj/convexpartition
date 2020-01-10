@@ -15,7 +15,7 @@ Planar graphs will be stored in the following format (everything is 0 indexed):
 **n** - The number of points
 
 For the next **n** lines:
-**i x\_i y\_i** - index, x-coordinate, y-coordinate
+**i x<sub>i</sub> y<sub>i</sub>** - index, x-coordinate, y-coordinate
 
 For the next **n** lines:
-**k\_i a\_1, a\_2, ... a\_** - number of neighbors for point i, then the index of its neighbours 
+**k<sub>i</sub> a<sub>1</sub>, a<sub>2</sub>, ... a<sub>k<sub>i</sub></sub>** - number of neighbors for point i, then the index of its neighbours 
