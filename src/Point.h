@@ -11,10 +11,17 @@ struct pt {
   pt operator-(const pt& o) const {
     return {x-o.x, y-o.y, -1};
   }
+  bool operator<(const pt& o) const {
+    return tie(y, x) < tie(o.y, o.x);
+  }
+
   friend int64_t cp(const pt& a, const pt& b) {
     return (int64_t)a.x*b.y - (int64_t)a.y*b.x;
   }
   friend int64_t cp(const pt& a, const pt& b, const pt& o) {
     return cp(a-o, b-o);
+  }
+  // is angle ABC > pi?
+  friend bool reflex(const pt& a, const pt& b, const pt& c) {
   }
 };
