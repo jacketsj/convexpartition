@@ -20,7 +20,7 @@ struct graph {
   void add_vertex(pt p) {
     assert(p.i == (int)points.size());
     points.push_back(p);
-    adj.emplace_back(p, points);
+    adj.emplace_back(pt_cmp(p, points));
   }
   void add_edge(int i, int j) {
     adj[i].insert(j);
