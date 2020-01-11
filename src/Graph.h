@@ -47,7 +47,7 @@ struct graph {
     }
     for(int i=0;i<n;i++) {
       int ki, a;
-      in >> ki;
+      if(!(in >> ki)) break; // read if there is anything left to read
       for(int j=0;j<ki;j++) {
         in >> a;
         add_edge(i, a);
