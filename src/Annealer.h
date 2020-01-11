@@ -2,6 +2,7 @@
 
 #include <bits/stdc++.h>
 using namespace std;
+using ld = long double;
 #include "Graph.h"
 
 struct annealer {
