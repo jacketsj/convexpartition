@@ -6,6 +6,8 @@ https://cgshop.ibr.cs.tu-bs.de/competition/cg-shop-2020/
 - CGAL: https://doc.cgal.org/latest/Manual/usage.html
 - MonoSAT: https://www.cs.ubc.ca/labs/isd/Projects/monosat/
 - cmake
+- zlib (zlib1g-dev)
+- gmp (libgmp3-dev)
 - cgshop2020-pyutils: `pip install cgshop2020-pyutils` (https://pypi.org/project/cgshop2020-pyutils/)
 
 # Instance format
