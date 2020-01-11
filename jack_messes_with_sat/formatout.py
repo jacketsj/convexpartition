@@ -11,7 +11,7 @@ def printPoints(instance):
     node_list = []
     i = 0
     for point in instance:
-        print(f"{i} {point.get_x()} {point.get_y()}")
+        printf("{i} {point.get_x()} {point.get_y()}")
         i = i + 1
 
 # UNTESTED
