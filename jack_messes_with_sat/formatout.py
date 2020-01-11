@@ -9,15 +9,26 @@ idb = InstanceDatabase(os.path.join(os.path.dirname(__file__), ".././challenge_i
 
 def printPoints(instance):
     node_list = []
+    i = 0
     for point in instance:
-        print(f"{point.get_x()} {point.get_y()}")
+        print(f"{i} {point.get_x()} {point.get_y()}")
+        i = i + 1
 
+# UNTESTED
 def readSolution(instance):
-    m = input()
+    n = input()
     solution = Solution(instance=instance.name)
-    for i in range(0,m):
-        a, b = input()
-        solution.add_edge(Edge(a,b))
+    for i in range(0,n):
+        i, x, y = input().split()
+        i = int(i)
+        x = int(x)
+        y = int(y)
+    for x in range(0,n):
+        line = input().split()
+        k = int(line[0])
+        for j in range(1,k+1):
+            y = int(line[j])
+            solution.add_edge(Edge(x,y))
     solution.delete_double_edges()
     return solution
 
