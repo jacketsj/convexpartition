@@ -80,6 +80,14 @@ struct edge
 	{
 		return angle() < other.angle();
 	}
+	bool to_the_left(const edge &other) const
+	{
+		ld a1 = angle(), a2 = other.angle();
+		ld diff = a1-a2;
+		while(diff < 0)
+			diff += 2*M_PI;
+		return diff <= M_PI;
+	}
 };
 
 void print_cnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
@@ -135,8 +143,11 @@ int main()
 		for (int i = 0; i < k; ++i)
 		{
 			vector<int> or_cur = {adj[v][i].e_index};
-			for (int j = i+1; adj[v][i].vec().cross(adj[v][j].vec()) > 0; j=(j+1)%k)
-				or_cur.push_back(adj[v][j].e_index);
+			//for (int j = i+1; adj[v][i].vec().cross(adj[v][j].vec()) > 0; j=(j+1)%k)
+			//for (int j = i+1; adj[v][i].to_the_left(adj[v][j]) > 0 && j!=i; j=(j+1)%k)
+			for (int j = i+1; j != i; j=(j+1)%k)
+				if (adj[v][i].vec().cross(adj[v][j].vec()) < 0)
+					or_cur.push_back(adj[v][j].e_index);
 			ors.push_back(or_cur);
 		}
 	}

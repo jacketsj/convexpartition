@@ -1,17 +1,25 @@
 # Load an instance
 import os
+import io
+import sys
+# Don't output the CGAL info
+sys.stdout = io.StringIO()
 from cgshop2020_pyutils import InstanceDatabase, BestSolutionSet, SolutionZipWriter
-from cgshop2020_pyutils import SolutionChecker, Visualizer
-from cgshop2020_pyutils import Solution, Instance, Edge
+#from cgshop2020_pyutils import SolutionChecker, Visualizer
+#from cgshop2020_pyutils import Solution, Instance, Edge
+sys.stdout = sys.__stdout__
 
 # load challenge instances
 idb = InstanceDatabase(os.path.join(os.path.dirname(__file__), ".././challenge_instances"))
 
 def printPoints(instance):
     node_list = []
-    i = 0
     for point in instance:
-        printf("{i} {point.get_x()} {point.get_y()}")
+        node_list.append((point.get_x(),point.get_y()))
+    print(len(node_list))
+    i = 0
+    for (x,y) in node_list:
+        print(f"{i} {x} {y}")
         i = i + 1
 
 # UNTESTED
