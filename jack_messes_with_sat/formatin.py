@@ -16,7 +16,7 @@ def printPoints(instance):
 
 # UNTESTED
 def readSolution(instance):
-    n = input()
+    n = int(input())
     solution = Solution(instance=instance.name)
     for i in range(0,n):
         i, x, y = input().split()

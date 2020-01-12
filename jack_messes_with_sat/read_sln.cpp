@@ -10,6 +10,7 @@ struct pt
 	num x, y;
 	pt() : i(-1), x(0), y(0) {}
 	pt(num x, num y) : i(-1), x(x), y(y) {}
+	pt(int i, num x, num y) : i(i), x(x), y(y) {}
 	pt subtract(const pt &o) const
 	{
 		return pt(x-o.x,y-o.y);
@@ -111,13 +112,15 @@ void print_cnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
 
 int main()
 {
+	// start by reading in problem file
+	freopen("uniform.0000100.2.pts","r",stdin);
 	int n; cin >> n;
 	vector<pt> points(n);
 	for (int i = 0; i < n; ++i)
 	{
 		int k;
 		num x, y; cin >> k >> x >> y;
-		points[i] = pt(x,y);
+		points[i] = pt(i,x,y);
 	}
 	vector<edge> edges;
 	vector<vector<edge>> adj(n);
@@ -132,49 +135,38 @@ int main()
 		}
 		sort(adj[i].begin(),adj[i].end());
 	}
-	vector<vector<int>> nands, ors;
-	//temporary, to be replaced with bentley-ottmann
-	for (int i = 0; i < m; ++i)
-		for (int j = i+1; j < m; ++j)
-			if (edges[i].ln.isect(edges[j].ln))
-			{
-				if (!(edges[i].ln.a.i == edges[j].ln.a.i
-						|| edges[i].ln.a.i == edges[j].ln.b.i
-						|| edges[i].ln.b.i == edges[j].ln.a.i
-						|| edges[i].ln.b.i == edges[j].ln.b.i))
-				{
-					nands.push_back({edges[i].e_index,edges[j].e_index});
-					//throw an error if these two edges actually share an endpoint
-					//cerr << "Invalid intersection found" << '\n';
-					//assert(false);
-				}
-			}
 
-	for (int v = 0; v < n; ++v)
+	// now read in out file from sat solver
+	freopen("uniform.0000100.2.v6.out","r",stdin);
+
+	string sat; cin >> sat;
+	assert(sat=="SAT");
+
+	// find which edges are included in the solution
+	vector<edge> incl_edges;
+	vector<vector<int>> incl_adj(n);
+	for (int i = 0; i < m; ++i)
 	{
-		int k = adj[v].size();
-		for (int i = 0; i < k; ++i)
+		int f; cin >> f;
+		if (f > 0)
 		{
-			vector<int> or_cur = {adj[v][i].e_index};
-			vector<int> or_cur_rev = or_cur;
-			//for (int j = i+1; adj[v][i].vec().cross(adj[v][j].vec()) > 0; j=(j+1)%k)
-			//for (int j = i+1; adj[v][i].to_the_left(adj[v][j]) > 0 && j!=i; j=(j+1)%k)
-			//for (int j = i+1; j != i; j=(j+1)%k)
-			for (int j = 0; j < k; ++j)
-			{
-				if (j != i)
-				{
-					auto res = adj[v][i].vec().cross(adj[v][j].vec());
-					if (res <= 0)
-						or_cur.push_back(adj[v][j].e_index);
-					if (res >= 0)
-						or_cur_rev.push_back(adj[v][j].e_index);
-				}
-			}
-			ors.push_back(or_cur);
-			ors.push_back(or_cur_rev);
+			edge &e = edges[f-1];
+			incl_edges.push_back(e);
+			int v = e.ln.a.i, u = e.ln.b.i;
+			incl_adj[v].push_back(u);
+			incl_adj[u].push_back(v);
 		}
 	}
 
-	print_cnf(m,ors,nands);
+	// now output instance format of plane graph
+	cout << n << '\n';
+	for (int i = 0; i < n; ++i)
+		cout << i << ' ' << points[i].x << ' ' << points[i].y << '\n';
+	for (int i = 0; i < n; ++i)
+	{
+		cout << incl_adj[i].size();
+		for (int j : incl_adj[i])
+			cout << ' ' << j;
+		cout << '\n';
+	}
 }

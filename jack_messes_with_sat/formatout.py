@@ -19,6 +19,8 @@ def printPoints(instance):
     print(len(node_list))
     i = 0
     for (x,y) in node_list:
+        x = int(x)
+        y = int(y)
         print(f"{i} {x} {y}")
         i = i + 1
 
