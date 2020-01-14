@@ -46,7 +46,6 @@ def readSolution(instance):
 # triangulation_solver = TrivialTriangulationSolver()
 #solutions = BestSolutionSet()
 #for instance in idb:
-    #solutions.add(useMonoSat(instance))
     #solutions.add(triangulation_solver(instance))
     #print(f"Computed triangulation for {instance.name}")
 

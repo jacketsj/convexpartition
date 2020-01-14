@@ -1,0 +1,1 @@
+University of Wroclaw MaxSAT and PB solver, called UWrMaxSat, based on MiniSatP by N. Een and N. Sorensson, with COMiniSatPS SAT solver by Chanseok Oh. 

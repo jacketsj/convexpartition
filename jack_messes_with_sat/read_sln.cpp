@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+#define int long long
+
 typedef int num;
 typedef long double fl;
 
@@ -47,6 +49,10 @@ struct pt
 	{
 		return x*o.y-o.x*y;
 	}
+	num dot(const pt &o) const
+	{
+		return x*o.x+y*o.y;
+	}
 };
 
 struct linseg
@@ -62,7 +68,10 @@ struct linseg
 	}
 	bool isect(const linseg &o) const
 	{
-		return isectray(o) && o.isectray(*this);
+		//return isectray(o) && o.isectray(*this);
+		auto c = o.a, d = o.b;
+		return ((d-a).cross(b-a)) * ((c-a).cross(b-a)) < 0
+			&& ((a-c).cross(d-c)) * ((b-c).cross(d-c)) < 0;
 	}
 };
 
@@ -73,7 +82,8 @@ struct edge
 	edge(pt a, pt b, int e) : ln(a,b), e_index(e) {}
 	pt vec() const
 	{
-		return ln.a-ln.b;
+		//return ln.a-ln.b;
+		return ln.b-ln.a;
 	}
 	fl angle() const
 	{
@@ -90,6 +100,12 @@ struct edge
 		while(diff < 0)
 			diff += 2*M_PI;
 		return diff <= M_PI;
+	}
+	void print() const
+	{
+		cerr << "edge: e_index=" << e_index
+			<< ", a=(" << ln.a.x << ',' << ln.a.y << "),"
+			<< ", b=(" << ln.b.x << ',' << ln.b.y << ")," << '\n';
 	}
 };
 
@@ -110,10 +126,23 @@ void print_cnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
 	}
 }
 
+string read_problem_file()
+{
+	string s; cin >> s;
+	for (char &c : s)
+		if (c == '-')
+			c = '.';
+	return s;
+}
+
+#undef int
 int main()
 {
-	// start by reading in problem file
-	freopen("uniform.0000100.2.pts","r",stdin);
+#define int long long
+	// start by reading in problem file name
+	string s = read_problem_file;
+
+	freopen(s+".in","r",stdin);
 	int n; cin >> n;
 	vector<pt> points(n);
 	for (int i = 0; i < n; ++i)
@@ -137,10 +166,10 @@ int main()
 	}
 
 	// now read in out file from sat solver
-	freopen("uniform.0000100.2.v6.out","r",stdin);
+	freopen(s+".sat","r",stdin);
 
 	string sat; cin >> sat;
-	assert(sat=="SAT");
+	assert(sat=="v");
 
 	// find which edges are included in the solution
 	vector<edge> incl_edges;
@@ -148,9 +177,11 @@ int main()
 	for (int i = 0; i < m; ++i)
 	{
 		int f; cin >> f;
+		f *= -1;
 		if (f > 0)
 		{
 			edge &e = edges[f-1];
+			assert(e.e_index==f); // verify indexing
 			incl_edges.push_back(e);
 			int v = e.ln.a.i, u = e.ln.b.i;
 			incl_adj[v].push_back(u);
@@ -159,6 +190,7 @@ int main()
 	}
 
 	// now output instance format of plane graph
+	freopen(s+".out","r",stdout);
 	cout << n << '\n';
 	for (int i = 0; i < n; ++i)
 		cout << i << ' ' << points[i].x << ' ' << points[i].y << '\n';

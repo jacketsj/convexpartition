@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+#define int long long
+
 typedef int num;
 typedef long double fl;
 
@@ -10,6 +12,7 @@ struct pt
 	num x, y;
 	pt() : i(-1), x(0), y(0) {}
 	pt(num x, num y) : i(-1), x(x), y(y) {}
+	pt(int i, num x, num y) : i(i), x(x), y(y) {}
 	pt subtract(const pt &o) const
 	{
 		return pt(x-o.x,y-o.y);
@@ -46,6 +49,10 @@ struct pt
 	{
 		return x*o.y-o.x*y;
 	}
+	num dot(const pt &o) const
+	{
+		return x*o.x+y*o.y;
+	}
 };
 
 struct linseg
@@ -61,7 +68,10 @@ struct linseg
 	}
 	bool isect(const linseg &o) const
 	{
-		return isectray(o) && o.isectray(*this);
+		//return isectray(o) && o.isectray(*this);
+		auto c = o.a, d = o.b;
+		return ((d-a).cross(b-a)) * ((c-a).cross(b-a)) < 0
+			&& ((a-c).cross(d-c)) * ((b-c).cross(d-c)) < 0;
 	}
 };
 
@@ -72,7 +82,8 @@ struct edge
 	edge(pt a, pt b, int e) : ln(a,b), e_index(e) {}
 	pt vec() const
 	{
-		return ln.a-ln.b;
+		//return ln.a-ln.b;
+		return ln.b-ln.a;
 	}
 	fl angle() const
 	{
@@ -89,6 +100,12 @@ struct edge
 		while(diff < 0)
 			diff += 2*M_PI;
 		return diff <= M_PI;
+	}
+	void print() const
+	{
+		cerr << "edge: e_index=" << e_index
+			<< ", a=(" << ln.a.x << ',' << ln.a.y << "),"
+			<< ", b=(" << ln.b.x << ',' << ln.b.y << ")," << '\n';
 	}
 };
 
@@ -109,15 +126,47 @@ void print_cnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
 	}
 }
 
+void print_wcnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
+{
+	cout << "p cnf " << m << ' ' << ors.size()+nands.size() << '\n';
+	for (auto &vi : ors)
+	{
+		for (auto i : vi)
+			cout << '-' << i << ' ';
+		cout << "0\n";
+	}
+	for (auto &vi : nands)
+	{
+		for (auto i : vi)
+			cout << i << ' ';
+		cout << "0\n";
+	}
+}
+
+string read_problem_file()
+{
+	string s; cin >> s;
+	for (char &c : s)
+		if (c == '-')
+			c = '.';
+	return s;
+}
+
+#undef int
 int main()
 {
+#define int long long
+	// start by reading in problem file name
+	string s = read_problem_file;
+
+	freopen(s+".in","r",stdin);
 	int n; cin >> n;
 	vector<pt> points(n);
 	for (int i = 0; i < n; ++i)
 	{
 		int k;
 		num x, y; cin >> k >> x >> y;
-		points[i] = pt(x,y);
+		points[i] = pt(i,x,y);
 	}
 	vector<edge> edges;
 	vector<vector<edge>> adj(n);
@@ -136,6 +185,7 @@ int main()
 	//temporary, to be replaced with bentley-ottmann
 	for (int i = 0; i < m; ++i)
 		for (int j = i+1; j < m; ++j)
+		{
 			if (edges[i].ln.isect(edges[j].ln))
 			{
 				if (!(edges[i].ln.a.i == edges[j].ln.a.i
@@ -149,32 +199,43 @@ int main()
 					//assert(false);
 				}
 			}
+		}
 
 	for (int v = 0; v < n; ++v)
 	{
 		int k = adj[v].size();
 		for (int i = 0; i < k; ++i)
 		{
-			vector<int> or_cur = {adj[v][i].e_index};
-			vector<int> or_cur_rev = or_cur;
+			vector<int> or_cur, or_cur_rev;
+			//vector<int> or_cur = {adj[v][i].e_index};
+			//vector<int> or_cur_rev = or_cur;
 			//for (int j = i+1; adj[v][i].vec().cross(adj[v][j].vec()) > 0; j=(j+1)%k)
 			//for (int j = i+1; adj[v][i].to_the_left(adj[v][j]) > 0 && j!=i; j=(j+1)%k)
 			//for (int j = i+1; j != i; j=(j+1)%k)
 			for (int j = 0; j < k; ++j)
 			{
+				auto res = adj[v][i].vec().cross(adj[v][j].vec());
+				//auto res = adj[v][i].vec().dot(adj[v][j].vec());
+				//if (res >= 0)
+				//	or_cur.push_back(adj[v][j].e_index);
+				//if (res <= 0)
+				//	or_cur_rev.push_back(adj[v][j].e_index);
 				if (j != i)
 				{
-					auto res = adj[v][i].vec().cross(adj[v][j].vec());
 					if (res <= 0)
 						or_cur.push_back(adj[v][j].e_index);
 					if (res >= 0)
 						or_cur_rev.push_back(adj[v][j].e_index);
 				}
 			}
-			ors.push_back(or_cur);
-			ors.push_back(or_cur_rev);
+			if (!or_cur.empty())
+				ors.push_back(or_cur);
+			if (!or_cur_rev.empty())
+				ors.push_back(or_cur_rev);
 		}
 	}
 
-	print_cnf(m,ors,nands);
+	freopen(s+".cnf","w",stdout);
+	//print_cnf(m,ors,nands);
+	print_wcnf(m,ors,nands);
 }
