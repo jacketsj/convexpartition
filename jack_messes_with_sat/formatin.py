@@ -14,7 +14,6 @@ def printPoints(instance):
         print(f"{i} {point.get_x()} {point.get_y()}")
         i = i + 1
 
-# UNTESTED
 def readSolution(instance):
     n = int(input())
     solution = Solution(instance=instance.name)

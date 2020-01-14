@@ -10,7 +10,7 @@ from cgshop2020_pyutils import InstanceDatabase, BestSolutionSet, SolutionZipWri
 sys.stdout = sys.__stdout__
 
 # load challenge instances
-idb = InstanceDatabase(os.path.join(os.path.dirname(__file__), ".././challenge_instances"))
+idb = InstanceDatabase(os.path.join(os.path.dirname(__file__), "../.././challenge_instances"))
 
 def printPoints(instance):
     node_list = []
@@ -24,7 +24,6 @@ def printPoints(instance):
         print(f"{i} {x} {y}")
         i = i + 1
 
-# UNTESTED
 def readSolution(instance):
     n = input()
     solution = Solution(instance=instance.name)
@@ -45,10 +44,16 @@ def readSolution(instance):
 # compute the triangulation for all instances
 # triangulation_solver = TrivialTriangulationSolver()
 #solutions = BestSolutionSet()
-#for instance in idb:
+og = sys.stdout
+for instance in idb:
+    f = open(instance.name+'.in','w')
+    sys.stdout = f
+    printPoints(instance)
+    sys.stdout = og
+    print("Completed " + instance.name)
     #solutions.add(triangulation_solver(instance))
     #print(f"Computed triangulation for {instance.name}")
 
-instance_loc = "uniform-0000100-2"
-instance = idb[instance_loc]
-printPoints(instance)
+#instance_loc = "uniform-0000100-2"
+#instance = idb[instance_loc]
+#printPoints(instance)
