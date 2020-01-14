@@ -129,9 +129,9 @@ void print_cnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
 string read_problem_file()
 {
 	string s; cin >> s;
-	for (char &c : s)
-		if (c == '-')
-			c = '.';
+	//for (char &c : s)
+	//	if (c == '-')
+	//		c = '.';
 	return s;
 }
 
@@ -140,9 +140,9 @@ int main()
 {
 #define int long long
 	// start by reading in problem file name
-	string s = read_problem_file;
+	string s = read_problem_file();
 
-	freopen(s+".in","r",stdin);
+	assert(freopen(("../in/"+s+".in").c_str(),"r",stdin) != NULL);
 	int n; cin >> n;
 	vector<pt> points(n);
 	for (int i = 0; i < n; ++i)
@@ -166,9 +166,14 @@ int main()
 	}
 
 	// now read in out file from sat solver
-	freopen(s+".sat","r",stdin);
+	assert(freopen(("sat/"+s+".sat").c_str(),"r",stdin) != NULL);
 
-	string sat; cin >> sat;
+	string sat;
+	do
+	{
+		cin >> sat;
+	}
+	while (sat != "v");
 	assert(sat=="v");
 
 	// find which edges are included in the solution
@@ -190,7 +195,7 @@ int main()
 	}
 
 	// now output instance format of plane graph
-	freopen(s+".out","r",stdout);
+	assert(freopen(("out/"+s+".out").c_str(),"w",stdout) != NULL);
 	cout << n << '\n';
 	for (int i = 0; i < n; ++i)
 		cout << i << ' ' << points[i].x << ' ' << points[i].y << '\n';

@@ -146,9 +146,9 @@ void print_wcnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
 string read_problem_file()
 {
 	string s; cin >> s;
-	for (char &c : s)
-		if (c == '-')
-			c = '.';
+	//for (char &c : s)
+	//	if (c == '-')
+	//		c = '.';
 	return s;
 }
 
@@ -157,9 +157,10 @@ int main()
 {
 #define int long long
 	// start by reading in problem file name
-	string s = read_problem_file;
+	string s = read_problem_file();
 
-	freopen(s+".in","r",stdin);
+	cout << "reading problem file: " << s << endl;
+	assert(freopen(("../in/"+s+".in").c_str(),"r",stdin) != NULL);
 	int n; cin >> n;
 	vector<pt> points(n);
 	for (int i = 0; i < n; ++i)
@@ -235,7 +236,9 @@ int main()
 		}
 	}
 
-	freopen(s+".cnf","w",stdout);
+	cout << "reading file" << endl;
+	assert(freopen(("cnf/"+s+".cnf").c_str(),"w",stdout) != NULL);
+
 	//print_cnf(m,ors,nands);
 	print_wcnf(m,ors,nands);
 }
