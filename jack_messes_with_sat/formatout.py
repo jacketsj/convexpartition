@@ -10,7 +10,7 @@ from cgshop2020_pyutils import InstanceDatabase, BestSolutionSet, SolutionZipWri
 sys.stdout = sys.__stdout__
 
 # load challenge instances
-idb = InstanceDatabase(os.path.join(os.path.dirname(__file__), "../.././challenge_instances"))
+idb = InstanceDatabase(os.path.join(os.path.dirname(__file__), ".././challenge_instances"))
 
 def printPoints(instance):
     node_list = []
