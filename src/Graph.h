@@ -28,7 +28,6 @@ struct graph {
 
   // Functions to add vertices/edges
   void add_vertex(pt p) {
-    cerr << "ADDING " << p.i << " " << p.x << " " << p.y <<endl;
     assert(p.i == (int)points.size()); 
     points.push_back(p);
     adj.emplace_back(pt_cmp(p, points));
@@ -121,7 +120,6 @@ struct graph {
     reset();
     ifstream in(filename);
     in >> n;
-    cerr << "READING " << n << endl;
     for(int i=0;i<n;i++) {
       int id, x, y;
       in >> id >> x >> y;
@@ -129,14 +127,16 @@ struct graph {
     }
     for(int i=0;i<n;i++) {
       int ki, a;
-      if(!(in >> ki)) break; // read if there is anything left to read
+      if(!(in >> ki)) return; // read if there is anything left to read
       for(int j=0;j<ki;j++) {
         in >> a;
         add_edge(i, a);
       }
     }
+    // If we finished reading the graph, initialize things
     init_inner_edges();
   }
+
   void write(string filename) {
     ofstream out(filename);
     out << n << '\n';
