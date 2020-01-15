@@ -43,7 +43,7 @@ checker = SolutionChecker()
 solutions = BestSolutionSet()
 for instance in idb:
     # change this for more instances
-    if len(instance) < 150 and instance.name.find("stars") == -1:
+    if len(instance) < 150 and instance.name.find("uniform-0000100-2") != -1:
         print(f"Reading solution to {instance.name}")
         f = open('out/'+instance.name+'.out','r')
         sys.stdin = f
@@ -54,7 +54,8 @@ for instance in idb:
         print(status.is_feasible())
         print(status.get_message())
         print(status.get_objective_value())
-        vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
+        vis.visualize_solution(solution=solution, instance=instance) # opens plot if possible
+        #vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
 
 #instance_loc = "uniform-0000100-2"
 #instance = idb[instance_loc]
@@ -71,9 +72,9 @@ for instance in idb:
 #vis.visualize_solution(solution=solution, instance=instance, path="fig_of_sat_on_" + instance_loc + ".pdf") # writes plot to file
 
 # write solutions into zip
-print("Creating zip. This can take some time...")
-with SolutionZipWriter("some_with_sat.zip") as zipper:
-    zipper.add_solutions(solutions)
+#print("Creating zip. This can take some time...")
+#with SolutionZipWriter("some_with_sat.zip") as zipper:
+#    zipper.add_solutions(solutions)
 
 #print("You can now upload 'my_first_upload.zip' on",
       #"https://cgshop.ibr.cs.tu-bs.de/competition/cg-shop-2020/")

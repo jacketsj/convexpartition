@@ -132,13 +132,13 @@ void print_wcnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
 	for (auto &vi : ors)
 	{
 		for (auto i : vi)
-			cout << '-' << i << ' ';
+			cout << i << ' ';
 		cout << "0\n";
 	}
 	for (auto &vi : nands)
 	{
 		for (auto i : vi)
-			cout << i << ' ';
+			cout << '-' << i << ' ';
 		cout << "0\n";
 	}
 }
