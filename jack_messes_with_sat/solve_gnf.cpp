@@ -183,6 +183,6 @@ int main()
 	int k = n-2; // number of convex hulls to try for
 
 	cout << "writing to gnf file" << endl;
-	assert(freopen(("../gnf/"+s+".gnf").c_str(),"w",stdout) != NULL);
+	assert(freopen(("gnf/"+s+".gnf").c_str(),"w",stdout) != NULL);
 	encode_ch(n,points,k);
 }
