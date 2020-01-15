@@ -2,6 +2,12 @@
 
 #include <bits/stdc++.h>
 #include "Point.h"
+// pbds for edge sampler
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+typedef tree<pair<int,int>, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update> edge_ost;
+// end pbds
+
 using namespace std;
 
 struct graph {
@@ -12,12 +18,38 @@ struct graph {
     const vector<pt>& v;
     pt_cmp(const pt& base, const vector<pt>& pts): o(base), v(pts) {}
     bool operator()(const int a, const int b) const {
-      bool aorig = (o < a); bool borig = (o < b);
+      bool aorig = (o < v[a]); bool borig = (o < v[b]);
       if (aorig ^ borig) return aorig;
       return cp(v[a], v[b], o) > 0;
     }
   };
   vector<set<int, pt_cmp>> adj;
+  edge_ost inner_edges;
+
+  // Functions to add vertices/edges
+  void add_vertex(pt p) {
+    assert(p.i == (int)points.size()); 
+    points.push_back(p);
+    adj.emplace_back(pt_cmp(p, points));
+  }
+  void add_edge(int i, int j) {
+    adj[i].insert(j);
+    adj[j].insert(i);
+    inner_edges.insert({i,j});
+    inner_edges.insert({j,i});
+  }
+  void remove_edge(int i, int j) {
+    adj[i].erase(j);
+    adj[j].erase(i);
+    inner_edges.erase({i,j});
+    inner_edges.erase({j,i});
+  }
+  void reset() {
+    n = 0;
+    points.clear();
+    adj.clear();
+  }
+
 
   // Functions to grab adjacent edges
   int halfedge_next(int a, int b) {
@@ -33,6 +65,24 @@ struct graph {
     return (it == adj[a].begin() ? *adj[a].rbegin() : *prev(it));
   }
 
+  void init_inner_edges() {
+    // remove outer edges from inner_edges start with point definitely on hull
+    int mni = 0;
+    for(int i=0;i<n;i++){
+      if (points[i] < points[mni]) {
+        mni = i;
+      }
+    }
+    // mni is lowest index coordinate point
+    int cur = mni;
+    int nex = *adj[mni].begin();
+    do {
+      inner_edges.erase({cur, nex});
+      inner_edges.erase({nex, cur});
+      int nexnex = halfedge_next(nex, cur);
+      tie(cur,nex) = tie(nex, nexnex);
+    } while(nex!=mni);
+  }
 
   // Geometric functions
   bool is_triangle(int a, int b) { 
@@ -40,32 +90,29 @@ struct graph {
     return halfedge_prev(b, a) == halfedge_next(a, b);
   }
   bool can_remove(int a, int b) {
-    if (!is_triangle(a, b) || !is_triangle(b, a)) return false;
+    // TODO: This is wrong, it assumes neighbors are both triangles.
     int c = halfedge_next(a, b);
     int d = halfedge_next(b, a);
     // check convexity of points
-    return !is_reflex(d, b, c) && !is_reflex(c, a, d);
+    return !is_reflex(points[d], points[b], points[c]) && !is_reflex(points[c], points[a], points[d]);
+  }
+  bool flip(int a, int b) {
+    assert(can_remove(a, b));
+    if (!is_triangle(a, b) || !is_triangle(b, a)) return false;
+    int c = halfedge_next(a, b);
+    int d = halfedge_next(b, a);
+    remove_edge(a, b);
+    add_edge(c, d);
+  }
+  bool triangulate_halfedge(int a, int b, int& e1, int& e2) {
+    // ensure a->b is a triangle
+    if (is_triangle(a,b)) return false;
+    int c = halfedge_next(a,b);
+    add_edge(b, c);
+    e1 = b, e2 = c;
+    return true;
   }
 
-  // Functions to add vertices/edges
-  void add_vertex(pt p) {
-    assert(p.i == (int)points.size()); 
-    points.push_back(p);
-    adj.emplace_back(pt_cmp(p, points));
-  }
-  void add_edge(int i, int j) {
-    adj[i].insert(j);
-    adj[j].insert(i);
-  }
-  void remove_edge(int i, int j) {
-    adj[i].erase(j);
-    adj[j].erase(i);
-  }
-  void reset() {
-    n = 0;
-    points.clear();
-    adj.clear();
-  }
   // Functions to load/save graphs
   void read(string filename) { // clear graph and read in new graph
     reset();
@@ -84,6 +131,7 @@ struct graph {
         add_edge(i, a);
       }
     }
+    init_inner_edges();
   }
   void write(string filename) {
     ofstream out(filename);

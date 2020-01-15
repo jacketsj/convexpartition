@@ -21,7 +21,7 @@ struct pt {
   friend int64_t cp(const pt& a, const pt& b, const pt& o) {
     return cp(a-o, b-o);
   }
-  // is angle abc > pi?
+  // is angle abc >= pi?
   friend bool is_reflex(const pt& a, const pt& b, const pt& c) {
     return cp(a,c,b) >= 0;
   }
