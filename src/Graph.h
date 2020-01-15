@@ -144,7 +144,7 @@ struct graph {
       for(int j: adj[i]) {
         out << j << " ";
       }
-      cout << '\n';
+      out << '\n';
     }
   }
 };
