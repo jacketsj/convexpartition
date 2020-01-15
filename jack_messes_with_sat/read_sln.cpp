@@ -182,7 +182,7 @@ int main()
 	for (int i = 0; i < m; ++i)
 	{
 		int f; cin >> f;
-		f *= -1;
+		//f *= -1;
 		if (f > 0)
 		{
 			edge &e = edges[f-1];
