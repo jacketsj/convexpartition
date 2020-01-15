@@ -2,6 +2,12 @@
 
 #include <bits/stdc++.h>
 #include "Point.h"
+// pbds for edge sampler
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+typedef tree<pair<int,int>, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update> edge_ost;
+// end pbds
+
 using namespace std;
 
 struct graph {
@@ -18,6 +24,7 @@ struct graph {
     }
   };
   vector<set<int, pt_cmp>> adj;
+  edge_ost inner_edges;
 
   // Functions to grab adjacent edges
   int halfedge_next(int a, int b) {
@@ -33,6 +40,23 @@ struct graph {
     return (it == adj[a].begin() ? *adj[a].rbegin() : *prev(it));
   }
 
+  void init_inner_edges() {
+    // remove outer edges from inner_edges start with point definitely on hull
+    int mni = 0;
+    for(int i=0;i<n;i++){
+      if (point < points[mni]) {
+        mni = i;
+      }
+    }
+    // mni is lowest index coordinate point
+    int cur = mni;
+    int nex = adj[mni].begin();
+    do {
+      inner_edges.erase(cur, nex);
+      inner_edges.erase(nex, cur);
+      tie(cur,nex) = tie(nex, halfedge_next(nex, cur));
+    } while(nex!=mni);
+  }
 
   // Geometric functions
   bool is_triangle(int a, int b) { 
@@ -46,6 +70,13 @@ struct graph {
     // check convexity of points
     return !is_reflex(d, b, c) && !is_reflex(c, a, d);
   }
+  void flip(int a, int b) {
+    assert(can_remove(a, b));
+    int c = halfedge_next(a, b);
+    int d = halfedge_next(b, a);
+    remove_edge(a, b);
+    insert_edge(c, d);
+  }
 
   // Functions to add vertices/edges
   void add_vertex(pt p) {
@@ -56,10 +87,14 @@ struct graph {
   void add_edge(int i, int j) {
     adj[i].insert(j);
     adj[j].insert(i);
+    inner_edges.insert(i,j);
+    inner_edges.insert(j,i);
   }
   void remove_edge(int i, int j) {
     adj[i].erase(j);
     adj[j].erase(i);
+    inner_edges.erase(i,j);
+    inner_edges.erase(j,i);
   }
   void reset() {
     n = 0;
@@ -84,6 +119,7 @@ struct graph {
         add_edge(i, a);
       }
     }
+    init_inner_edges();
   }
   void write(string filename) {
     ofstream out(filename);

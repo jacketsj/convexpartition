@@ -7,10 +7,24 @@ using ld = long double;
 
 struct annealer {
   mt19937 rng;
+  int it, maxit;
   ld temperature;
-  graph g;
-  void flip(int u, int v) {
+  graph& g;
+
+  annealer(graph& _g) : g(_g) {
+    it = 0;
+    maxit = g.n*100;
   }
-  void remove(int u, int v) {
+
+  void update_temperature() {
+    temperature = 1 - (ld)it / maxit;
+  }
+
+  pair<int,int> bad_sample_halfedge() {
+    return g.edges.find_by_order(rng()%g.edges.size());
+  }
+
+  void anneal() {
+    pair<int, int> halfedge = bad_sample_halfedge();
   }
 };
