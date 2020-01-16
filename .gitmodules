@@ -1,6 +1,3 @@
-[submodule "jack_messes_with_sat/monosat"]
-	path = sat/monosat
-	url = https://github.com/sambayless/monosat.git
 [submodule "jack_messes_with_sat/UWrMaxSat"]
 	path = jack_messes_with_sat/UWrMaxSat
 	url = https://github.com/marekpiotrow/UWrMaxSat

@@ -23,10 +23,13 @@ void delaunate(graph& g) {
 }
 
 int main() {
-  string filename = "stars-0000010";
-  graph g;
-  g.read("../in/"+filename+".in");
-  delaunate(g);
-  g.write("../triangulations/"+filename+".tri");
-  cerr << filename << " was triangulated and had " << m << " faces " <<endl;
+  ifstream base_names_file("../base_names.txt");
+  string filename;
+  while(base_names_file >> filename) {
+    graph g;
+    g.read("../in/"+filename+".in");
+    delaunate(g);
+    g.write("../triangulations/"+filename+".tri");
+    cerr << filename << " was triangulated and had " << m << " faces " <<endl;
+  }
 }
