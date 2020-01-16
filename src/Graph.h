@@ -5,7 +5,7 @@
 // pbds for edge sampler
 #include <ext/pb_ds/assoc_container.hpp>
 using namespace __gnu_pbds;
-typedef tree<pair<int,int>, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update> edge_ost;
+typedef tree<pair<int,int>, null_type, less<pair<int,int>>, rb_tree_tag, tree_order_statistics_node_update> edge_ost;
 // end pbds
 
 using namespace std;
@@ -97,12 +97,14 @@ struct graph {
     return !is_reflex(points[d], points[b], points[c]) && !is_reflex(points[c], points[a], points[d]);
   }
   bool flip(int a, int b) {
+    // return whether flip worked
     assert(can_remove(a, b));
     if (!is_triangle(a, b) || !is_triangle(b, a)) return false;
     int c = halfedge_next(a, b);
     int d = halfedge_next(b, a);
     remove_edge(a, b);
     add_edge(c, d);
+    return true;
   }
   bool triangulate_halfedge(int a, int b, int& e1, int& e2) {
     // ensure a->b is a triangle
@@ -121,18 +123,20 @@ struct graph {
     for(int i=0;i<n;i++) {
       int id, x, y;
       in >> id >> x >> y;
-      add_vertex({id, x, y});
+      add_vertex({x, y, id});
     }
     for(int i=0;i<n;i++) {
       int ki, a;
-      if(!(in >> ki)) break; // read if there is anything left to read
+      if(!(in >> ki)) return; // read if there is anything left to read
       for(int j=0;j<ki;j++) {
         in >> a;
         add_edge(i, a);
       }
     }
+    // If we finished reading the graph, initialize things
     init_inner_edges();
   }
+
   void write(string filename) {
     ofstream out(filename);
     out << n << '\n';
