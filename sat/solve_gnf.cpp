@@ -1,12 +1,50 @@
 #include <bits/stdc++.h>
-#include <../src/Point.h>
-#include <../src/Graph.h>
+#include "../src/Point.h"
+#include "../src/Graph.h"
+#include "../src/extern/delaunator.hpp"
 using namespace std;
 
 string read_problem_file()
 {
 	string s; cin >> s;
 	return s;
+}
+
+void require_point(pt p, int k,
+	vector<vector<int>> &pt_cl, vector<vector<int>> &or_cl, int &m)
+{
+	vector<int> cur;
+	for (int i = 0; i < k; ++i)
+	{
+		++m;
+		pt_cl.push_back({i,m,2,p.x,p.y});
+		cur.push_back(m);
+	}
+	or_cl.push_back(cur);
+}
+
+void add_triangle_pts(int n, vector<pt> &points, int k,
+	vector<vector<int>> &pt_cl, vector<vector<int>> &or_cl, int &m)
+{
+	if (n == 1) // unnecessary probably
+		return;
+
+	vector<double> dinput;
+	for (pt& p: points)
+	{
+		dinput.push_back(p.x);
+		dinput.push_back(p.y);
+	}
+	delaunator::Delaunator d(dinput);
+	int s = d.triangles.size()/3;
+	for (int i = 0; i < s; ++i)
+	{
+		int a = d.triangles[3*i+0];
+		int b = d.triangles[3*i+1];
+		int c = d.triangles[3*i+2];
+		pt median = (points[a]+points[b]+points[c])/3;
+		require_point(median, k, pt_cl, or_cl, m);
+	}
 }
 
 void add_rand_pt(int n, vector<pt> &points, int k, vector<vector<int>> &pt_cl, vector<vector<int>> &or_cl, int &m)
@@ -66,7 +104,7 @@ vector<vector<int>> read_ch(int n, vector<pt> points, int k)
 			pt& fp = sets[i][0]; // fixed-point in set
 			sort(sets[i].begin()+1,sets[i].end(), // skip fp
 				[&](const pt& a, const pt& b) {
-					return (a-fp).cross(b-fp) < 0; //either direction ok
+					return cross(a-fp,b-fp) < 0; //either direction ok
 				});
 		}
 	// now, our point sets are ordered around the convex hull
@@ -131,11 +169,13 @@ void encode_ch(int n, vector<pt> points, int k)
 			ch_coll.push_back({i,j,++m});
 			units.push_back(-m);
 		}
-	// add random interior points
-	for (int i = 0; i < 3*n; ++i)
-		add_rand_pt(n, points, k, pt_cl, or_cl, m);
+	//for (int i = 0; i < 3*n; ++i)
+		//add_rand_pt(n, points, k, pt_cl, or_cl, m);
+	// add triangulation interior points
+	add_triangle_pts(n,points,k,pt_cl,or_cl,m);
 
 	// print
+	// note: monosat does not use problem statement line
 	int num_clauses = units.size() + or_cl.size();
 	cout << "p cnf " << m << " " << num_clauses << '\n';
 	for (int u : units)
@@ -198,7 +238,7 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < n; ++i)
 	{
 		int k;
-		num x, y; cin >> k >> x >> y;
+		int x, y; cin >> k >> x >> y;
 		points[i] = pt(i,x,y);
 	}
 
