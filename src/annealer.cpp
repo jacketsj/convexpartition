@@ -5,8 +5,11 @@ using namespace std;
 
 int main() {
   graph g;
-  g.read("../in/stars-0000010.in");
+  string filename = "stars-0000020";
+  g.read("../triangulations/"+filename+".tri");
+  int m = g.inner_edges.size();
   annealer ann(g);
   ann.anneal();
-  g.write("../out/stars-0000010.out");
+  cerr << filename << " started with " << m << " inner edges and finished with " << g.inner_edges.size() <<endl;
+  g.write("../out/"+filename+".out");
 }

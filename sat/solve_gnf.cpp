@@ -1,119 +1,7 @@
 #include <bits/stdc++.h>
+#include <../src/Point.h>
+#include <../src/Graph.h>
 using namespace std;
-
-#define int long long
-
-typedef int num;
-typedef long double fl;
-
-struct pt
-{
-	int i;
-	num x, y;
-	pt() : i(-1), x(0), y(0) {}
-	pt(num x, num y) : i(-1), x(x), y(y) {}
-	pt(int i, num x, num y) : i(i), x(x), y(y) {}
-	pt add(const pt &o) const
-	{
-		return pt(x+o.x,y+o.y);
-	}
-	pt operator+(const pt &o) const
-	{
-		return add(o);
-	}
-	pt subtract(const pt &o) const
-	{
-		return pt(x-o.x,y-o.y);
-	}
-	pt operator-(const pt &o) const
-	{
-		return subtract(o);
-	}
-	pt operator/(num d) const
-	{
-		assert(d!=0);
-		return pt(x/d,y/d);
-	}
-	num normsqr() const
-	{
-		return x*x+y*y;
-	}
-	num distsqr(const pt &o) const
-	{
-		return subtract(o).normsqr();
-	}
-	fl angle(const pt &o) const
-	{
-		pt n = subtract(o);
-		return atan2(n.y,n.x);
-	}
-	fl angle() const
-	{
-		return angle(pt(0,0));
-	}
-	num cross(const pt &o) const
-	{
-		return x*o.y-o.x*y;
-	}
-	num dot(const pt &o) const
-	{
-		return x*o.x+y*o.y;
-	}
-};
-
-struct linseg
-{
-	pt a, b;
-	linseg(pt a, pt b) : a(a), b(b) {}
-	linseg(num x1, num y1, num x2, num y2) : a(pt(x1,y1)), b(pt(x2,y2)) {}
-	bool isectray(const linseg &o) const
-	{
-		return ((b.x-a.x)*(o.a.y-b.y)-(b.y-a.y)*(o.a.x-b.x))
-			* ((b.x-a.x)*(o.b.y-b.y)-(b.y-a.y)*(o.b.x-b.x))
-			< 0;
-	}
-	bool isect(const linseg &o) const
-	{
-		//return isectray(o) && o.isectray(*this);
-		auto c = o.a, d = o.b;
-		return ((d-a).cross(b-a)) * ((c-a).cross(b-a)) < 0
-			&& ((a-c).cross(d-c)) * ((b-c).cross(d-c)) < 0;
-	}
-};
-
-struct edge
-{
-	linseg ln;
-	int e_index;
-	edge(pt a, pt b, int e) : ln(a,b), e_index(e) {}
-	pt vec() const
-	{
-		//return ln.a-ln.b;
-		return ln.b-ln.a;
-	}
-	fl angle() const
-	{
-		return vec().angle();
-	}
-	bool operator<(const edge &other) const
-	{
-		return angle() < other.angle();
-	}
-	bool to_the_left(const edge &other) const
-	{
-		fl a1 = angle(), a2 = other.angle();
-		fl diff = a1-a2;
-		while(diff < 0)
-			diff += 2*M_PI;
-		return diff <= M_PI;
-	}
-	void print() const
-	{
-		cerr << "edge: e_index=" << e_index
-			<< ", a=(" << ln.a.x << ',' << ln.a.y << "),"
-			<< ", b=(" << ln.b.x << ',' << ln.b.y << ")," << '\n';
-	}
-};
 
 string read_problem_file()
 {
@@ -158,7 +46,7 @@ vector<vector<int>> read_ch(int n, vector<pt> points, int k)
 	while (cin >> f)
 	{
 		//int f; cin >> f;
-		if (f > 0) // default is false, so only need this case
+		if (f > 0 && f <= n*k) // default is false, so only need this case
 		{
 			input[f-1]=true;
 			++tr;
@@ -288,7 +176,6 @@ void encode_ch(int n, vector<pt> points, int k)
 	}
 }
 
-#undef int
 int main(int argc, char* argv[])
 {
 	ios::sync_with_stdio(0);
@@ -301,7 +188,6 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-#define int long long
 	// start by reading in problem file name
 	string s = read_problem_file();
 

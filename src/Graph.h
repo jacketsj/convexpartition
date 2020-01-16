@@ -33,12 +33,16 @@ struct graph {
     adj.emplace_back(pt_cmp(p, points));
   }
   void add_edge(int i, int j) {
+    if (i==j) write_matlab();
+    assert(i!=j);
     adj[i].insert(j);
     adj[j].insert(i);
     inner_edges.insert({i,j});
     inner_edges.insert({j,i});
   }
   void remove_edge(int i, int j) {
+    assert(adj[i].count(j));
+    assert(adj[j].count(i));
     adj[i].erase(j);
     adj[j].erase(i);
     inner_edges.erase({i,j});
@@ -48,19 +52,24 @@ struct graph {
     n = 0;
     points.clear();
     adj.clear();
+    inner_edges.clear();
   }
 
 
   // Functions to grab adjacent edges
   int halfedge_next(int a, int b) {
     // Return next edge ccw 
-    assert(adj[a].count(b));
+    if (!adj[a].count(b)) {
+      assert(adj[a].count(b));
+    }
     auto it = next(adj[a].find(b));
     return (it == adj[a].end() ? *adj[a].begin() : *it);
   }
   int halfedge_prev(int a, int b) {
     // Return next edge cw 
-    assert(adj[a].count(b));
+    if (!adj[a].count(b)) {
+      assert(adj[a].count(b));
+    }
     auto it = adj[a].find(b);
     return (it == adj[a].begin() ? *adj[a].rbegin() : *prev(it));
   }
@@ -90,16 +99,19 @@ struct graph {
     return halfedge_prev(b, a) == halfedge_next(a, b);
   }
   bool can_remove(int a, int b) {
-    // TODO: This is wrong, it assumes neighbors are both triangles.
     int c = halfedge_next(a, b);
-    int d = halfedge_next(b, a);
-    // check convexity of points
-    return !is_reflex(points[d], points[b], points[c]) && !is_reflex(points[c], points[a], points[d]);
+    int d = halfedge_prev(a, b);
+    if (is_reflex(points[d], points[a], points[c])) return false;
+    swap(a, b);
+    c = halfedge_next(a, b);
+    d = halfedge_prev(a, b);
+    if (is_reflex(points[d], points[a], points[c])) return false;
+    return true;
   }
   bool flip(int a, int b) {
     // return whether flip worked
-    assert(can_remove(a, b));
     if (!is_triangle(a, b) || !is_triangle(b, a)) return false;
+    if (!can_remove(a, b)) return false;
     int c = halfedge_next(a, b);
     int d = halfedge_next(b, a);
     remove_edge(a, b);

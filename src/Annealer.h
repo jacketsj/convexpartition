@@ -51,6 +51,8 @@ struct annealer {
         if (t2) g.remove_edge(e10,e11);
       }
     }
+    assert(g.adj[a].size() >=2);
+    assert(g.adj[b].size() >=2);
     ++it;
   }
   
