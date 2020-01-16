@@ -25,6 +25,11 @@ struct graph {
   };
   vector<set<int, pt_cmp>> adj;
   edge_ost inner_edges;
+  int chull_edge_num=0;
+
+  int get_edge_num() {
+    return chull_edge_num + inner_edges.size()/2;
+  }
 
   // Functions to add vertices/edges
   void add_vertex(pt p) {
@@ -86,6 +91,7 @@ struct graph {
     int cur = mni;
     int nex = *adj[mni].begin();
     do {
+      chull_edge_num++;
       inner_edges.erase({cur, nex});
       inner_edges.erase({nex, cur});
       int nexnex = halfedge_next(nex, cur);
@@ -152,7 +158,6 @@ struct graph {
     }
     // If we finished reading the graph, initialize things
     init_inner_edges();
-    print_matlab();
     cerr << "DONE READING GRAPH " << filename <<endl;
   }
 

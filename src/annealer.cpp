@@ -5,12 +5,12 @@ using namespace std;
 
 int main() {
   graph g;
-  string filename = "stars-0000200";
+  string filename = "euro-night-0000100";
   g.read("../triangulations/"+filename+".tri");
-  int m = g.inner_edges.size();
+  int m = g.get_edge_num();
   annealer ann(g);
   ann.anneal();
-  cerr << filename << " started with " << m << " inner edges and finished with " << g.inner_edges.size() <<endl;
+  cerr << filename << " started with " << m << " inner edges and finished with " << g.get_edge_num() <<endl;
   g.write("../out/"+filename+".out");
-  g.print_matlab();
+  //g.print_matlab();
 }

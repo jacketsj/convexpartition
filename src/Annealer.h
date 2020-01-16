@@ -57,7 +57,7 @@ struct annealer {
   }
   
   void anneal() {
-    for(it=0;it<maxit*2;it++) {
+    for(it=0;it<maxit*1.1L;it++) {
       update_temperature();
       anneal_step();
     }
