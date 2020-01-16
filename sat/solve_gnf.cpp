@@ -104,7 +104,7 @@ vector<vector<int>> read_ch(int n, vector<pt> points, int k)
 			pt& fp = sets[i][0]; // fixed-point in set
 			sort(sets[i].begin()+1,sets[i].end(), // skip fp
 				[&](const pt& a, const pt& b) {
-					return cross(a-fp,b-fp) < 0; //either direction ok
+					return cp(a-fp,b-fp) < 0; //either direction ok
 				});
 		}
 	// now, our point sets are ordered around the convex hull
@@ -134,22 +134,31 @@ void encode_ch(int n, vector<pt> points, int k)
 	// (later: put these points around our existing set)
 
 	int m = 0; // note: sat vars start at 1
-	//vector<vector<int>> psi(n,vector<int>(k)); // point/set index
+	vector<vector<int>> psi(n,vector<int>(k)); // point/set index
 	vector<int> units; // unit clauses
 	vector<vector<int>> or_cl(n); // or clauses
 	vector<vector<int>> pt_cl; // point clauses
 	vector<vector<int>> ch_coll; // ch's collide
 	//vector<vector<int>> p_hu; // point on ch
 	vector<vector<int>> ch_isect_pt; // points inside ch (none!)
+	vector<vector<int>> pb_min3; // pseudoboolean constraints for >=3 true
 	for (int i = 0; i < n; ++i)
 		for (int j = 0; j < k; ++j)
 		{
-			//psi[i][j] = ++m;
-			++m;
+			psi[i][j] = ++m;
 
 			or_cl[i].push_back(m);
 			pt_cl.push_back({j,m,2,points[i].x,points[i].y});
 		}
+
+	// every point-set must contain at least 3 non-interior points
+	for (int i = 0; i < k; ++i)
+	{
+		vector<int> incl;
+		for (int j = 0; j < n; ++j)
+			incl.push_back(psi[j][i]);
+		pb_min3.push_back(incl);
+	}
 
 	for (int i = 0; i < n; ++i)
 		for (int j = 0; j < k; ++j)
@@ -175,7 +184,7 @@ void encode_ch(int n, vector<pt> points, int k)
 	add_triangle_pts(n,points,k,pt_cl,or_cl,m);
 
 	// print
-	// note: monosat does not use problem statement line
+	// note: monosat does not use problem statement line, so this doesn't realy matter
 	int num_clauses = units.size() + or_cl.size();
 	cout << "p cnf " << m << " " << num_clauses << '\n';
 	for (int u : units)
@@ -213,6 +222,13 @@ void encode_ch(int n, vector<pt> points, int k)
 		for (auto i : u)
 			cout << ' ' << i;
 		cout << '\n';
+	}
+	for (auto &u : pb_min3)
+	{
+		cout << "pb >= 3 " << u.size();
+		for (auto i : u)
+			cout << ' ' << i;
+		cout << " 0\n";
 	}
 }
 
