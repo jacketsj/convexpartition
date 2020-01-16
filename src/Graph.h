@@ -33,8 +33,8 @@ struct graph {
     adj.emplace_back(pt_cmp(p, points));
   }
   void add_edge(int i, int j) {
-    if (i==j) write_matlab();
     assert(i!=j);
+    if (adj[i].count(j)) return;
     adj[i].insert(j);
     adj[j].insert(i);
     inner_edges.insert({i,j});
@@ -90,7 +90,7 @@ struct graph {
       inner_edges.erase({nex, cur});
       int nexnex = halfedge_next(nex, cur);
       tie(cur,nex) = tie(nex, nexnex);
-    } while(nex!=mni);
+    } while(cur!=mni);
   }
 
   // Geometric functions
@@ -101,11 +101,15 @@ struct graph {
   bool can_remove(int a, int b) {
     int c = halfedge_next(a, b);
     int d = halfedge_prev(a, b);
-    if (is_reflex(points[d], points[a], points[c])) return false;
+    if (is_reflex(points[d], points[a], points[c])){
+      return false;
+    }
     swap(a, b);
     c = halfedge_next(a, b);
     d = halfedge_prev(a, b);
-    if (is_reflex(points[d], points[a], points[c])) return false;
+    if (is_reflex(points[d], points[a], points[c])) {
+      return false;
+    }
     return true;
   }
   bool flip(int a, int b) {
@@ -122,6 +126,7 @@ struct graph {
     // ensure a->b is a triangle
     if (is_triangle(a,b)) return false;
     int c = halfedge_next(a,b);
+    assert(!adj[b].count(c));
     add_edge(b, c);
     e1 = b, e2 = c;
     return true;
@@ -135,7 +140,7 @@ struct graph {
     for(int i=0;i<n;i++) {
       int id, x, y;
       in >> id >> x >> y;
-      add_vertex({x, y, id});
+      add_vertex(pt(id, x, y));
     }
     for(int i=0;i<n;i++) {
       int ki, a;
@@ -147,6 +152,31 @@ struct graph {
     }
     // If we finished reading the graph, initialize things
     init_inner_edges();
+    print_matlab();
+    cerr << "DONE READING GRAPH " << filename <<endl;
+  }
+
+  void print_matlab() {
+    cout << "g = graph([";
+    for(int i=0;i<n;i++) {
+      for(int j: adj[i]) {
+        if (i>j) continue;
+        cout << i+1 << " ";
+      }
+    }
+    cout << "], [";
+    for(int i=0;i<n;i++) {
+      for(int j: adj[i]) {
+        if (i>j) continue;
+        cout << j+1 << " ";
+      }
+    }
+    cout << "])" << endl;
+    cout << "plot(g, 'XData', [";
+    for(int i=0;i<n;i++) cout << points[i].x << " "; 
+    cout << "], 'YData', [";
+    for(int i=0;i<n;i++) cout << points[i].y << " "; 
+    cout << "])" <<endl;
   }
 
   void write(string filename) {

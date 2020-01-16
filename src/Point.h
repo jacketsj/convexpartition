@@ -4,7 +4,7 @@
 using namespace std;
 
 struct pt {
-  int x, y, i;
+  int i, x, y;
 	pt() : i(-1), x(0), y(0) {}
 	pt(int x, int y) : i(-1), x(x), y(y) {}
 	pt(int i, int x, int y) : i(i), x(x), y(y) {}
@@ -34,7 +34,7 @@ struct pt {
   }
   // is angle abc >= pi?
   friend bool is_reflex(const pt& a, const pt& b, const pt& c) {
-    return cp(a,c,b) >= 0;
+    return cp(a,c,b) < 0;
   }
 	friend int64_t distsqr(const pt& a, const pt& b) {
 		return (a-b).normsqr();
