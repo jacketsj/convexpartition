@@ -25,7 +25,7 @@ struct graph {
   };
   vector<set<int, pt_cmp>> adj;
   edge_ost inner_edges;
-  int chull_edge_num=0;
+  int chull_edge_num;
 
   int get_edge_num() {
     return chull_edge_num + inner_edges.size()/2;
@@ -58,6 +58,7 @@ struct graph {
     points.clear();
     adj.clear();
     inner_edges.clear();
+    chull_edge_num=0;
   }
 
 
@@ -105,6 +106,8 @@ struct graph {
     return halfedge_prev(b, a) == halfedge_next(a, b);
   }
   bool can_remove(int a, int b) {
+    // inner edges of degree 2 arise from colinear points
+    if (adj[a].size()==2 || adj[b].size() == 2) return false; 
     int c = halfedge_next(a, b);
     int d = halfedge_prev(a, b);
     if (is_reflex(points[d], points[a], points[c])){
