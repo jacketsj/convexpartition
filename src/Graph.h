@@ -26,6 +26,7 @@ struct graph {
   vector<set<int, pt_cmp>> adj;
   edge_ost inner_edges;
   int chull_edge_num;
+  ld tot_edge_len;
 
   int get_edge_num() {
     return chull_edge_num + inner_edges.size()/2;
@@ -44,6 +45,7 @@ struct graph {
     adj[j].insert(i);
     inner_edges.insert({i,j});
     inner_edges.insert({j,i});
+    tot_edge_len += sqrt(distsqr(points[i], points[j]));
   }
   void remove_edge(int i, int j) {
     assert(adj[i].count(j));
@@ -52,13 +54,15 @@ struct graph {
     adj[j].erase(i);
     inner_edges.erase({i,j});
     inner_edges.erase({j,i});
+    tot_edge_len -= sqrt(distsqr(points[i], points[j]));
   }
   void reset() {
     n = 0;
+    chull_edge_num = 0;
+    tot_edge_len = 0;
     points.clear();
     adj.clear();
     inner_edges.clear();
-    chull_edge_num=0;
   }
 
 
