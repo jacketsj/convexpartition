@@ -10,7 +10,7 @@ from cgshop2020_pyutils import Solution, Instance, Edge
 sys.stdout = sys.__stdout__
 
 # load challenge instances
-idb = InstanceDatabase(os.path.join(os.path.dirname(__file__), ".././challenge_instances/second_instance_batch"))
+idb = InstanceDatabase(os.path.join(os.path.dirname(__file__), ".././challenge_instances/"))
 
 def printPoints(instance):
     node_list = []
@@ -45,7 +45,7 @@ for instance in idb:
     # change this for more instances
     #if len(instance) < 150 and instance.name.find("stars") == -1:
         print(f"Reading solution to {instance.name}")
-        f = open('out/'+instance.name+'.out','r')
+        f = open('../min_from_triangulation/'+instance.name+'.out','r')
         sys.stdin = f
         solution = readSolution(instance)
         solutions.add(solution)
