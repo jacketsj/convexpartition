@@ -50,7 +50,8 @@ def readSolution(instance):
 og = sys.stdout
 for instance in idb:
     print("Considering " + instance.name)
-    if len(instance) < 150 and instance.name.find("stars") == -1:
+    if len(instance) < 150 and instance.name.find("euro-night-0000020") != -1:
+    #if len(instance) < 150 and instance.name.find("stars") == -1:
         print("Reading solution to " + instance.name)
         subprocess.run("echo \""+instance.name+"\" | ./read_sln",shell=True)
         print("Done " + instance.name)

@@ -128,40 +128,37 @@ struct graph {
     return true;
   }
 
-  bool rot_ccw(int a, int b) {
+	bool rot(int a, int &b, int bb) {
     assert(adj[a].count(b));
     if (adj[a].size()==2 || adj[b].size() == 2) return false; 
     if (is_triangle(a,b)) return false;
-    // can rotate edge a->b clockwise around a
+    // can rotate edge a->b towards bb around a
+    // try a -> b to become a -> bb
+    if (adj[a].count(bb)) return false;
+    add_edge(a, bb);
+    if (can_remove(a,b)){
+      remove_edge(a,b);
+			b = bb;
+      return true;
+    }
+    remove_edge(a,bb);
+    return false;
+	}
+
+	// rewrite with the new vertex after the flip
+  bool rot_ccw(int a, int &b) {
     int nb = halfedge_next(b, a);
-    // try a -> b to become a -> nb
-    if (adj[a].count(nb)) return false;
-    add_edge(a, nb);
-    if (can_remove(a,b)){
-      remove_edge(a,b);
-      return true;
-    }
-    remove_edge(a,nb);
-    return false;
-  }
-  bool rot_cw(int a, int b) {
-    assert(adj[a].count(b));
-    if (adj[a].size()==2 || adj[b].size() == 2) return false; 
-    if (is_triangle(a,b)) return false;
-    // can rotate edge a->b clockwise around a
-    int pb = halfedge_prev(b, a);
-    // try a -> b to become a -> pb
-    if (adj[a].count(pb)) return false;
-    add_edge(a, pb);
-    if (can_remove(a,b)){
-      remove_edge(a,b);
-      return true;
-    }
-    remove_edge(a,pb);
-    return false;
+		return rot(a,b,nb);
   }
 
-  bool flip(int a, int b) {
+	// rewrite with the new vertex after the flip
+  bool rot_cw(int a, int &b) {
+    int pb = halfedge_prev(b, a);
+		return rot(a,b,pb);
+  }
+
+	// rewrite with the new vertices after the flip
+  bool flip(int& a, int& b) {
     // return whether flip worked
     if (!is_triangle(a, b) || !is_triangle(b, a)) return false;
     if (!can_remove(a, b)) return false;
@@ -169,6 +166,7 @@ struct graph {
     int d = halfedge_next(b, a);
     remove_edge(a, b);
     add_edge(c, d);
+		a = c; b = d;
     return true;
   }
   bool triangulate_halfedge(int a, int b, int& e1, int& e2) {
