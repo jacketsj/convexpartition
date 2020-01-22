@@ -10,7 +10,7 @@ from cgshop2020_pyutils import Solution, Instance, Edge
 sys.stdout = sys.__stdout__
 
 # load challenge instances
-idb = InstanceDatabase(os.path.join(os.path.dirname(__file__), ".././challenge_instances"))
+idb = InstanceDatabase(os.path.join(os.path.dirname(__file__), ".././challenge_instances/second_instance_batch"))
 
 def printPoints(instance):
     node_list = []
@@ -43,18 +43,18 @@ checker = SolutionChecker()
 solutions = BestSolutionSet()
 for instance in idb:
     # change this for more instances
-    if len(instance) < 150 and instance.name.find("stars") == -1:
+    #if len(instance) < 150 and instance.name.find("stars") == -1:
         print(f"Reading solution to {instance.name}")
         f = open('out/'+instance.name+'.out','r')
         sys.stdin = f
         solution = readSolution(instance)
         solutions.add(solution)
         sys.stdin = og
-        status = checker(instance=instance, solution=solution)
-        print(status.is_feasible())
-        print(status.get_message())
-        print(status.get_objective_value())
-        vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
+        #status = checker(instance=instance, solution=solution)
+        #print(status.is_feasible())
+        #print(status.get_message())
+        #print(status.get_objective_value())
+        #vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
 
 #instance_loc = "uniform-0000100-2"
 #instance = idb[instance_loc]
