@@ -38,6 +38,7 @@ struct annealer {
     pair<int, int> halfedge = bad_sample_halfedge();
     int a = halfedge.first;
     int b = halfedge.second;
+    if (rng()%2) swap(a,b);
     if (dis(rng) > temperature) { // removal probability
       if (g.can_remove(a,b)) {
         g.remove_edge(a,b);

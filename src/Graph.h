@@ -40,20 +40,20 @@ struct graph {
   }
   void add_edge(int i, int j) {
     assert(i!=j);
-    if (adj[i].count(j)) return;
+    if (i>j) swap(i,j);
+    //if (adj[i].count(j)) return;
     adj[i].insert(j);
     adj[j].insert(i);
     inner_edges.insert({i,j});
-    inner_edges.insert({j,i});
     tot_edge_len += sqrt(distsqr(points[i], points[j]));
   }
   void remove_edge(int i, int j) {
-    assert(adj[i].count(j));
-    assert(adj[j].count(i));
+    //assert(adj[i].count(j));
+    //assert(adj[j].count(i));
+    if (i>j) swap(i,j);
     adj[i].erase(j);
     adj[j].erase(i);
     inner_edges.erase({i,j});
-    inner_edges.erase({j,i});
     tot_edge_len -= sqrt(distsqr(points[i], points[j]));
   }
   void reset() {
@@ -69,17 +69,13 @@ struct graph {
   // Functions to grab adjacent edges
   int halfedge_next(int a, int b) {
     // Return next edge ccw 
-    if (!adj[a].count(b)) {
-      assert(adj[a].count(b));
-    }
+    // if (!adj[a].count(b)) { assert(adj[a].count(b)); }
     auto it = next(adj[a].find(b));
     return (it == adj[a].end() ? *adj[a].begin() : *it);
   }
   int halfedge_prev(int a, int b) {
     // Return next edge cw 
-    if (!adj[a].count(b)) {
-      assert(adj[a].count(b));
-    }
+    // if (!adj[a].count(b)) { assert(adj[a].count(b)); }
     auto it = adj[a].find(b);
     return (it == adj[a].begin() ? *adj[a].rbegin() : *prev(it));
   }
@@ -97,8 +93,7 @@ struct graph {
     int nex = *adj[mni].begin();
     do {
       chull_edge_num++;
-      inner_edges.erase({cur, nex});
-      inner_edges.erase({nex, cur});
+      inner_edges.erase({min(cur, nex), max(cur, nex)});
       int nexnex = halfedge_next(nex, cur);
       tie(cur,nex) = tie(nex, nexnex);
     } while(cur!=mni);
