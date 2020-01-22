@@ -50,7 +50,8 @@ def readSolution(instance):
 og = sys.stdout
 for instance in idb:
     print("Considering " + instance.name)
-    if len(instance) < 150 and instance.name.find("stars") == -1:
+    if len(instance) < 150 and instance.name.find("euro-night-0000020") != -1:
+    #if len(instance) < 150 and instance.name.find("stars") == -1:
         print("Solving " + instance.name)
         subprocess.run("UWrMaxSat-1.0/bin/uwrmaxsat -m cnf/" + instance.name + ".cnf -v0 -cpu-lim=30 > sat/" + instance.name + ".sat",shell=True);
         print("Solved " + instance.name)
