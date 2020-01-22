@@ -9,13 +9,14 @@ struct annealer {
   mt19937 rng;
   graph& g;
   uniform_real_distribution<ld> dis;
-  int it, maxit;
+  int it, maxit, success;
   ld temperature;
 
   annealer(graph& _g) : rng(0xF), //rng(chrono::high_resolution_clock::now().time_since_epoch().count()), 
                         g(_g), dis(0.0L, 1.0L) {
     it = 0;
-    maxit = 10*g.n*Log2(g.n); // 10 n log n
+    // n log^2 n should be enough whp to visit all edges
+    maxit = 10*g.n*log2(g.n)*log2(g.n); 
     temperature = 1;
   }
 
@@ -36,30 +37,36 @@ struct annealer {
     pair<int, int> halfedge = bad_sample_halfedge();
     int a = halfedge.first;
     int b = halfedge.second;
-    if (dis(rng) > temperature) {
+    if (dis(rng) > temperature) { // removal probability
       if (g.can_remove(a,b)) {
         g.remove_edge(a,b);
+        success++;
       }
     }
     else {
-      /*
-      int e00=-1, e01=-1, e10=-1, e11=-1;
-      bool t1 = g.triangulate_halfedge(a, b, e00, e01);
-      bool t2 = g.triangulate_halfedge(b, a, e10, e11);
-      if (!g.flip(a,b)) {
-        // if we failed to flip, put back removed edges(?)
-        // TODO: Figure out what we want to do here
-        if (t1) g.remove_edge(e00,e01);
-        if (t2) g.remove_edge(e10,e11);
-      }
+      /* actions to try:
+      g.flip(a,b);
+      g.rot_cw(a,b);
+      g.rot_ccw(a,b);
+      g.rot_cw(b,a);
+      g.rot_ccw(b,a);
       */
+      if (g.flip(a,b)) success++;
+      else if (rng()%2) {
+        if (g.rot_cw(a,b)) success++;
+        else if (g.rot_ccw(a,b)) success++;
+      }
+      else {
+        if (g.rot_ccw(a,b)) success++;
+        else if (g.rot_cw(a,b)) success++;
+      }
     }
     ++it;
   }
   
   void anneal() {
     cerr << "ANNEALING FOR " << maxit << " iterations" <<endl;
-    for(it=0;it<maxit*1.1L+100;it++) {
+    for(it=0;it<maxit*1.1L+10000;it++) { // run some extra steps for safety
       update_temperature();
       anneal_step();
     }

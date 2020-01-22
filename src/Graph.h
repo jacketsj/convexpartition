@@ -103,6 +103,8 @@ struct graph {
   // Geometric functions
   bool is_triangle(int a, int b) { 
     // return true if halfedge a->b is on triangle (faces oriented ccw)
+    // if degenerate, can't be side of triangle
+    if (adj[a].size() == 2 || adj[b].size() == 2) return false;
     return halfedge_prev(b, a) == halfedge_next(a, b);
   }
   bool can_remove(int a, int b) {
@@ -121,6 +123,40 @@ struct graph {
     }
     return true;
   }
+
+  bool rot_ccw(int a, int b) {
+    assert(adj[a].count(b));
+    if (adj[a].size()==2 || adj[b].size() == 2) return false; 
+    if (is_triangle(a,b)) return false;
+    // can rotate edge a->b clockwise around a
+    int nb = halfedge_next(b, a);
+    // try a -> b to become a -> nb
+    if (adj[a].count(nb)) return false;
+    add_edge(a, nb);
+    if (can_remove(a,b)){
+      remove_edge(a,b);
+      return true;
+    }
+    remove_edge(a,nb);
+    return false;
+  }
+  bool rot_cw(int a, int b) {
+    assert(adj[a].count(b));
+    if (adj[a].size()==2 || adj[b].size() == 2) return false; 
+    if (is_triangle(a,b)) return false;
+    // can rotate edge a->b clockwise around a
+    int pb = halfedge_prev(b, a);
+    // try a -> b to become a -> pb
+    if (adj[a].count(pb)) return false;
+    add_edge(a, pb);
+    if (can_remove(a,b)){
+      remove_edge(a,b);
+      return true;
+    }
+    remove_edge(a,pb);
+    return false;
+  }
+
   bool flip(int a, int b) {
     // return whether flip worked
     if (!is_triangle(a, b) || !is_triangle(b, a)) return false;
