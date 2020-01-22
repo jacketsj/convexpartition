@@ -9,25 +9,26 @@ struct annealer {
   mt19937 rng;
   graph& g;
   uniform_real_distribution<ld> dis;
-  int it, maxit, success;
+  int it, MAXT, MAXIT, success;
   ld temperature;
 
   annealer(graph& _g) : rng(0xF), //rng(chrono::high_resolution_clock::now().time_since_epoch().count()), 
                         g(_g), dis(0.0L, 1.0L) {
-    it = 0;
     // n log^2 n should be enough whp to visit all edges
-    maxit = 10*g.n*log2(g.n)*log2(g.n); 
+    MAXT = 10*g.n*log2(g.n)*log2(g.n); 
+    MAXIT = MAXT+3*n*log(n)+100000;
     temperature = 1;
   }
 
   void update_temperature() {
-    temperature = max(0.L, 1 - (ld)it / maxit);
+    temperature = max(0.L, 1 - (ld)it / MAXT);
   }
 
   pair<int,int> bad_sample_halfedge() { 
     // This is slow! we sample via pbds order stat tree
     return *g.inner_edges.find_by_order(rng()%g.inner_edges.size());
   }
+
 
   void anneal_step() {
     // Rule: 
@@ -50,6 +51,7 @@ struct annealer {
       g.rot_ccw(a,b);
       g.rot_cw(b,a);
       g.rot_ccw(b,a);
+
       */
       if (g.flip(a,b)) success++;
       else if (rng()%2) {
@@ -65,8 +67,8 @@ struct annealer {
   }
   
   void anneal() {
-    cerr << "ANNEALING FOR " << maxit << " iterations" <<endl;
-    for(it=0;it<maxit*1.1L+10000;it++) { // run some extra steps for safety
+    cerr << "ANNEALING FOR " << MAXIT << " iterations" <<endl;
+    for(it=0;it<MAXIT;it++) { // run some extra steps for safety
       update_temperature();
       anneal_step();
     }
