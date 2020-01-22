@@ -9,7 +9,7 @@ struct annealer {
   mt19937 rng;
   graph& g;
   uniform_real_distribution<ld> dis;
-  int it, MAXT, MAXIT, success;
+  int64_t it, MAXT, MAXIT, success;
   ld temperature;
 
   annealer(graph& _g) : rng(0xF), //rng(chrono::high_resolution_clock::now().time_since_epoch().count()), 

@@ -2,6 +2,7 @@
 
 #include <bits/stdc++.h>
 using namespace std;
+typedef long double ld;
 
 struct pt {
   int i, x, y;
@@ -41,5 +42,8 @@ struct pt {
   }
   friend int64_t dot(const pt& a, const pt &b) {
     return (int64_t)a.x*b.x+(int64_t)a.y*b.y;
+  }
+  friend ld dist(const pt& a, const pt& b) {
+    return sqrt(distsqr(a,b));
   }
 };
