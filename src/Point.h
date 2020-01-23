@@ -19,8 +19,8 @@ struct pt {
     return tie(y, x) < tie(o.y, o.x);
   }
   int64_t normsqr() const {
-    int64_t x(x), y(y);
-    return x*x+y*y;
+    int64_t a(x), b(y);
+    return b*b+a*a;
   }
   pt operator/(int d) const {
     assert(d!=0);
