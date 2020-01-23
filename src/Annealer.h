@@ -68,9 +68,9 @@ struct annealer {
   }
   
   void anneal() {
-    static const int PRINT_ITER = 1e6;
+    static const int64_t PRINT_ITER = 1e7;
     cerr << "ANNEALING FOR " << MAXIT << " iterations" <<endl;
-    for(it=0;it<MAXIT;it++) { // run some extra steps for safety
+    for(it=1;it<=MAXIT;it++) { // run some extra steps for safety
       if (it % PRINT_ITER == 0) cerr << "ANNEALING ITERATION " << it << endl;
       update_temperature();
       anneal_step();

@@ -29,7 +29,7 @@ struct graph {
   ld tot_edge_len;
 
   int get_edge_num() {
-    return chull_edge_num + inner_edges.size()/2;
+    return chull_edge_num + inner_edges.size();
   }
 
   // Functions to add vertices/edges
