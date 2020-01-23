@@ -6,8 +6,8 @@ using namespace std;
 int main() {
   ifstream in("../base_names.txt");
   string filename = "euro-night-0010000";
-  //while(in >> filename) {
-    //if (filename < "uniform-0090000-2") continue;
+//  while(in >> filename) {
+//    if (filename < "uniform-0090000-2") continue;
     graph g;
     g.read("../triangulations/"+filename+".tri");
 //    g.print_matlab();
