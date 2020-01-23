@@ -41,7 +41,7 @@ struct graph {
   void add_edge(int i, int j) {
     assert(i!=j);
     if (i>j) swap(i,j);
-    //if (adj[i].count(j)) return;
+    if (adj[i].count(j)) return;
     adj[i].insert(j);
     adj[j].insert(i);
     inner_edges.insert({i,j});
