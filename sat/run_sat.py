@@ -44,20 +44,26 @@ def readSolution(instance):
     solution.delete_double_edges()
     return solution
 
+og = sys.stdout
+
+def runOn(instance):
+    print("Solving " + instance.name)
+    subprocess.run("UWrMaxSat-1.0/bin/uwrmaxsat -m cnf/" + instance.name + ".cnf -v0 -cpu-lim=30 > sat/" + instance.name + ".sat",shell=True);
+    print("Solved " + instance.name)
+
 # compute the triangulation for all instances
 # triangulation_solver = TrivialTriangulationSolver()
 #solutions = BestSolutionSet()
-og = sys.stdout
-for instance in idb:
-    print("Considering " + instance.name)
-    if len(instance) < 150 and instance.name.find("euro-night-0000020") != -1:
-    #if len(instance) < 150 and instance.name.find("stars") == -1:
-        print("Solving " + instance.name)
-        subprocess.run("UWrMaxSat-1.0/bin/uwrmaxsat -m cnf/" + instance.name + ".cnf -v0 -cpu-lim=30 > sat/" + instance.name + ".sat",shell=True);
-        print("Solved " + instance.name)
-    #solutions.add(triangulation_solver(instance))
-    #print(f"Computed triangulation for {instance.name}")
+#for instance in idb:
+#    print("Considering " + instance.name)
+#    if len(instance) < 150 and instance.name.find("euro-night-0000020") != -1:
+#        runOn(instance)
+#    #if len(instance) < 150 and instance.name.find("stars") == -1:
+#    #solutions.add(triangulation_solver(instance))
+#    #print(f"Computed triangulation for {instance.name}")
 
 #instance_loc = "uniform-0000100-2"
-#instance = idb[instance_loc]
+instance_loc = "euro-night-0000020"
+instance = idb[instance_loc]
+runOn(instance)
 #printPoints(instance)

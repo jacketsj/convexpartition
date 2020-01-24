@@ -36,26 +36,34 @@ def readSolution(instance):
     solution.delete_double_edges()
     return solution
 
-#solutions = BestSolutionSet()
 og = sys.stdin
 vis = Visualizer()
 checker = SolutionChecker()
 solutions = BestSolutionSet()
-for instance in idb:
-    # change this for more instances
-    if len(instance) < 150 and instance.name.find("euro-night-0000020") != -1:
-        print(f"Reading solution to {instance.name}")
-        f = open('out/'+instance.name+'.out','r')
-        sys.stdin = f
-        solution = readSolution(instance)
-        solutions.add(solution)
-        sys.stdin = og
-        status = checker(instance=instance, solution=solution)
-        print(status.is_feasible())
-        print(status.get_message())
-        print(status.get_objective_value())
-        vis.visualize_solution(solution=solution, instance=instance) # opens plot if possible
-        #vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
+
+def runOn(instance):
+    print(f"Reading solution to {instance.name}")
+    f = open('out/'+instance.name+'.out','r')
+    sys.stdin = f
+    solution = readSolution(instance)
+    solutions.add(solution)
+    sys.stdin = og
+    status = checker(instance=instance, solution=solution)
+    print(status.is_feasible())
+    print(status.get_message())
+    print(status.get_objective_value())
+    vis.visualize_solution(solution=solution, instance=instance) # opens plot if possible
+    #vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
+
+instance_loc = "euro-night-0000020"
+instance = idb[instance_loc]
+runOn(instance)
+
+#solutions = BestSolutionSet()
+#for instance in idb:
+#    # change this for more instances
+#    if len(instance) < 150 and instance.name.find("euro-night-0000020") != -1:
+#        runOn(instance)
 
 #instance_loc = "uniform-0000100-2"
 #instance = idb[instance_loc]
