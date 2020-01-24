@@ -128,18 +128,25 @@ void print_cnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
 
 void print_wcnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
 {
-	cout << "p cnf " << m << ' ' << ors.size()+nands.size() << '\n';
+	int required = m + 1;
+	cout << "p wcnf " << m << ' ' << ors.size()+nands.size() << ' ' << required << '\n';
 	for (auto &vi : ors)
 	{
+		cout << required << ' ';
 		for (auto i : vi)
 			cout << i << ' ';
 		cout << "0\n";
 	}
 	for (auto &vi : nands)
 	{
+		cout << required << ' ';
 		for (auto i : vi)
 			cout << '-' << i << ' ';
 		cout << "0\n";
+	}
+	for (int i = 1; i <= m; ++i)
+	{
+		cout << "1 " << i << " 0\n";
 	}
 }
 

@@ -44,20 +44,25 @@ def readSolution(instance):
     solution.delete_double_edges()
     return solution
 
+def runOn(instance):
+    print("Reading solution to " + instance.name)
+    subprocess.run("echo \""+instance.name+"\" | ./read_sln",shell=True)
+    print("Done " + instance.name)
+
 # compute the triangulation for all instances
 # triangulation_solver = TrivialTriangulationSolver()
 #solutions = BestSolutionSet()
 og = sys.stdout
-for instance in idb:
-    print("Considering " + instance.name)
-    if len(instance) < 150 and instance.name.find("euro-night-0000020") != -1:
-    #if len(instance) < 150 and instance.name.find("stars") == -1:
-        print("Reading solution to " + instance.name)
-        subprocess.run("echo \""+instance.name+"\" | ./read_sln",shell=True)
-        print("Done " + instance.name)
-    #solutions.add(triangulation_solver(instance))
-    #print(f"Computed triangulation for {instance.name}")
+#for instance in idb:
+#    print("Considering " + instance.name)
+#    #if len(instance) < 150 and instance.name.find("stars") == -1:
+#    if len(instance) < 150 and instance.name.find("euro-night-0000020") != -1:
+#        runOn(instance)
+#    #solutions.add(triangulation_solver(instance))
+#    #print(f"Computed triangulation for {instance.name}")
 
 #instance_loc = "uniform-0000100-2"
-#instance = idb[instance_loc]
+instance_loc = "euro-night-0000020"
+instance = idb[instance_loc]
+runOn(instance)
 #printPoints(instance)
