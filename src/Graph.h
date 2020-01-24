@@ -41,7 +41,7 @@ struct graph {
   void add_edge(int i, int j) {
     assert(i!=j);
     if (i>j) swap(i,j);
-    //if (adj[i].count(j)) return;
+    if (adj[i].count(j)) return;
     adj[i].insert(j);
     adj[j].insert(i);
     inner_edges.insert({i,j});
@@ -124,7 +124,7 @@ struct graph {
   }
 
 	bool rot(int a, int &b, int bb) {
-    assert(adj[a].count(b));
+    // assert(adj[a].count(b));
     if (adj[a].size()==2 || adj[b].size() == 2) return false; 
     if (is_triangle(a,b)) return false;
     // can rotate edge a->b towards bb around a
@@ -168,7 +168,7 @@ struct graph {
     // ensure a->b is a triangle
     if (is_triangle(a,b)) return false;
     int c = halfedge_next(a,b);
-    assert(!adj[b].count(c));
+    // assert(!adj[b].count(c));
     add_edge(b, c);
     e1 = b, e2 = c;
     return true;

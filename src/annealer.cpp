@@ -6,8 +6,8 @@ using namespace std;
 int main() {
   ifstream in("../base_names.txt");
   string filename = "euro-night-0010000";
-  while(in >> filename) {
-    if (filename < "uniform-0090000-2") continue;
+//  while(in >> filename) {
+//    if (filename < "uniform-0090000-2") continue;
     graph g;
     g.read("../triangulations/"+filename+".tri");
 //    g.print_matlab();
@@ -17,5 +17,5 @@ int main() {
     cerr << filename << " started with " << m << " edges and finished with " << g.get_edge_num() <<endl;
     g.write("../min_from_triangulation/"+filename+".out");
 //    g.print_matlab();
-  }
+  //}
 }
