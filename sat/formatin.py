@@ -72,7 +72,7 @@ for instance in idb:
 
 # write solutions into zip
 print("Creating zip. This can take some time...")
-with SolutionZipWriter("annealed.zip") as zipper:
+with SolutionZipWriter("exp-temperature.zip") as zipper:
     zipper.add_solutions(solutions)
 
 #print("You can now upload 'my_first_upload.zip' on",
