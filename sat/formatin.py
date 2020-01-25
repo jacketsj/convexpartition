@@ -44,6 +44,7 @@ solutions = BestSolutionSet()
 for instance in idb:
     # change this for more instances
     #if len(instance) < 150 and instance.name.find("stars") == -1:
+    if instance.name.find("mona") == -1:
         print(f"Reading solution to {instance.name}")
         f = open('../min_from_triangulation/'+instance.name+'.out','r')
         sys.stdin = f
