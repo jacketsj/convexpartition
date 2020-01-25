@@ -5,7 +5,7 @@ using namespace std;
 
 int main() {
   ifstream in("../base_names.txt");
-  string filename = "euro-night-0001000";
+  string filename = "rop0000355";
 //  while(in >> filename) {
 //    if (filename < "uniform-0090000-2") continue;
     graph g;

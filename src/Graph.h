@@ -27,12 +27,24 @@ struct graph {
   };
   vector<set<int, pt_cmp>> adj;
   set<pair<int,int>> chull_edges;
-  edge_ost good_edges;
+  edge_ost good_edges, removable_edges;
   int edge_cnt;
   ld tot_edge_len;
 
   int get_edge_num() {
     return edge_cnt;
+  }
+
+  // MUST call this function after ADDING/REMOVING edges
+  void update_status(int a, int b) {
+    if (a>b) swap(a, b);
+    if (chull_edges.count({a, b})) {
+      return;
+    }
+    if (can_remove(a,b)) removable_edges.insert({a,b});
+    else removable_edges.erase({a,b});
+    if (can_flip(a, b) || can_rot(a, b) || can_rot(b, a)) good_edges.insert({a, b});
+    else good_edges.erase({a, b});
   }
 
   // Functions to add vertices/edges
@@ -50,6 +62,7 @@ struct graph {
     e = halfedge_next(j,i);
     f = halfedge_prev(j,i);
     remove_edge(i,j);
+    removable_edges.erase({i, j});
     good_edges.erase({i, j});
     update_status(i,c);
     update_status(i,d);
@@ -139,7 +152,9 @@ struct graph {
 
     // update status of all edges
     for(int i=0;i<n;i++) {
-      for(int j:adj[i]) {
+      vector<int> adji; // cast to vector to avoid iteration problems
+      for(int j:adj[i]) adji.push_back(j);
+      for(int j:adji) {
         if (i<j) update_status(i,j);
       }
     }
@@ -167,15 +182,6 @@ struct graph {
     return !chull_edges.count({a,b}) && can_remove_half(a, b) && can_remove_half(b, a);
   }
 
-  void update_status(int a, int b) {
-    if (a>b) swap(a, b);
-    if (chull_edges.count({a, b})) {
-      return;
-    }
-    if (can_remove(a,b) || can_flip(a, b) || can_rot(a, b) || can_rot(b, a)) 
-      good_edges.insert({a, b});
-    else good_edges.erase({a, b});
-  }
 
   bool rot(int a, int &b, int nb, bool update=0) {
     // assert(adj[a].count(b));
