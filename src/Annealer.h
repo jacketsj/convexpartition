@@ -20,6 +20,7 @@ struct annealer {
     MAXT = 11*10*g.n*log2(g.n)*log2(g.n);  // ~ 12 hrs
     MAXIT = MAXT+3*g.n*log(g.n)+10000000;
     temperature = 1;
+    success = 0;
   }
 
   void update_temperature() {
