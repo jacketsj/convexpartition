@@ -224,7 +224,10 @@ struct graph {
     int c = halfedge_next(a, b);
     int d = halfedge_next(b, a);
     remove_edge(a, b, update);
-    assert(add_edge(c, d, update));
+    if(!add_edge(c, d, update)){
+      add_edge(a, b, update);
+      return false;
+    }
     a = c; b = d;
     return true;
   }
