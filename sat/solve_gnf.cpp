@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #include "../src/Point.h"
-#include "../src/Graph.h"
+//#include "../src/Graph.h"
 #include "../src/extern/delaunator.hpp"
 using namespace std;
 
@@ -259,6 +259,7 @@ int main(int argc, char* argv[])
 	}
 
 	int k = n-2; // number of convex hulls to try for
+	cerr << "using k=" << k << endl;
 
 	if (!read)
 	{

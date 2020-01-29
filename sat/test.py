@@ -44,6 +44,7 @@ solutions = BestSolutionSet()
 def runOn(instance):
     print(f"Reading solution to {instance.name}")
     #f = open('out/'+instance.name+'.out','r')
+    #f = open('../min_from_triangulation/'+instance.name+'.out','r')
     f = open('../min_from_triangulation/'+instance.name+'.out','r')
     sys.stdin = f
     solution = readSolution(instance)
@@ -56,8 +57,9 @@ def runOn(instance):
     vis.visualize_solution(solution=solution, instance=instance) # opens plot if possible
     #vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
 
-instance_loc = "stars-0000020"
+#instance_loc = "stars-0000020"
 #instance_loc = "euro-night-0000020"
+instance_loc = "ortho_rect_union_713"
 instance = idb[instance_loc]
 runOn(instance)
 

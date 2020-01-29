@@ -146,7 +146,7 @@ void print_wcnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
 	}
 	for (int i = 1; i <= m; ++i)
 	{
-		cout << "1 " << i << " 0\n";
+		cout << "1 " << -i << " 0\n";
 	}
 }
 
@@ -249,3 +249,5 @@ int main()
 	//print_cnf(m,ors,nands);
 	print_wcnf(m,ors,nands);
 }
+
+//delta debugging

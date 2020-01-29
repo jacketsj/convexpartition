@@ -43,18 +43,20 @@ checker = SolutionChecker()
 solutions = BestSolutionSet()
 for instance in idb:
     # change this for more instances
-    #if len(instance) < 150 and instance.name.find("stars") == -1:
+    #if len(instance) < 50 and len(instance) >= 30 and instance.name.find("stars") == -1:
+    if instance.name.find("mona") == -1:
         print(f"Reading solution to {instance.name}")
-        f = open('../min_from_triangulation/'+instance.name+'.out','r')
+        #f = open('../min_from_triangulation/'+instance.name+'.out','r')
+        f = open('out/'+instance.name+'.out','r')
         sys.stdin = f
         solution = readSolution(instance)
         solutions.add(solution)
         sys.stdin = og
-        #status = checker(instance=instance, solution=solution)
-        #print(status.is_feasible())
-        #print(status.get_message())
-        #print(status.get_objective_value())
-        #vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
+        status = checker(instance=instance, solution=solution)
+        print(status.is_feasible())
+        print(status.get_message())
+        print(status.get_objective_value())
+        vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
 
 #instance_loc = "uniform-0000100-2"
 #instance = idb[instance_loc]
@@ -72,6 +74,7 @@ for instance in idb:
 
 # write solutions into zip
 print("Creating zip. This can take some time...")
+#with SolutionZipWriter("50over30.zip") as zipper:
 with SolutionZipWriter("exp-temperature.zip") as zipper:
     zipper.add_solutions(solutions)
 

@@ -49,10 +49,15 @@ def runOn(instance):
     subprocess.run("echo \""+instance.name+"\" | ./solve",shell=True)
     print("Done " + instance.name)
 
+for instance in idb:
+    print("Considering " + instance.name)
+    if len(instance) < 150:
+        runOn(instance)
+
 # compute the triangulation for all instances
 # triangulation_solver = TrivialTriangulationSolver()
 #solutions = BestSolutionSet()
-og = sys.stdout
+#og = sys.stdout
 #for instance in idb:
 #    print("Considering " + instance.name)
 #    if len(instance) < 300:
@@ -61,7 +66,7 @@ og = sys.stdout
     #print(f"Computed triangulation for {instance.name}")
 
 #instance_loc = "uniform-0000100-2"
-instance_loc = "euro-night-0000020"
-instance = idb[instance_loc]
-runOn(instance)
+#instance_loc = "euro-night-0000020"
+#instance = idb[instance_loc]
+#runOn(instance)
 #printPoints(instance)
