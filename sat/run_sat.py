@@ -48,22 +48,28 @@ og = sys.stdout
 
 def runOn(instance):
     print("Solving " + instance.name)
-    subprocess.run("UWrMaxSat-1.0/bin/uwrmaxsat -m cnf/" + instance.name + ".cnf -v0 -cpu-lim=30 > sat/" + instance.name + ".sat",shell=True);
+    subprocess.run("UWrMaxSat-1.0/bin/uwrmaxsat -m cnf/" + instance.name + ".cnf -v0 -cpu-lim=30 > sat/" + instance.name + ".sat",shell=True)
     print("Solved " + instance.name)
+
+for instance in idb:
+    print("Considering " + instance.name)
+    if len(instance) >= 30 and len(instance) < 50:
+        runOn(instance)
 
 # compute the triangulation for all instances
 # triangulation_solver = TrivialTriangulationSolver()
-#solutions = BestSolutionSet()
-#for instance in idb:
+# solutions = BestSolutionSet()
+# for instance in idb:
 #    print("Considering " + instance.name)
 #    if len(instance) < 150 and instance.name.find("euro-night-0000020") != -1:
+#    if len(instance) < 150:
 #        runOn(instance)
 #    #if len(instance) < 150 and instance.name.find("stars") == -1:
 #    #solutions.add(triangulation_solver(instance))
 #    #print(f"Computed triangulation for {instance.name}")
 
 #instance_loc = "uniform-0000100-2"
-instance_loc = "euro-night-0000020"
-instance = idb[instance_loc]
-runOn(instance)
+#instance_loc = "euro-night-0000020"
+#instance = idb[instance_loc]
+#runOn(instance)
 #printPoints(instance)

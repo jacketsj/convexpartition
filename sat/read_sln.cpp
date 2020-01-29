@@ -169,11 +169,11 @@ int main()
 	assert(freopen(("sat/"+s+".sat").c_str(),"r",stdin) != NULL);
 
 	string sat;
-	do
-	{
-		cin >> sat;
-	}
-	while (sat != "v");
+	//do
+	//{
+	//	//cin >> sat;
+	//}
+	while (sat != "v" && cin >> sat) {};
 	assert(sat=="v");
 
 	// find which edges are included in the solution
