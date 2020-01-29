@@ -19,6 +19,7 @@ int main() {
   string filename = "euro-night-0010000";
   thread_pool tp;
   while (in >> filename) {
+    if (filename.find("mona") != string::npos) continue;
     packaged_task<void()> p(bind(run, filename));
     tp.add(move(p));
   }
