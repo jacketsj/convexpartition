@@ -35,22 +35,65 @@ Edge intersection is still n^2. Can we do better?
 Maybe we can formulate the events from bentley-ottmann (or an online algorithm?)
 
 
+===========================================
 n^2 symbolic edge formulation:
 Denote points 0 through n-1
 Start with m edges 0 through m-1.
 
 For each edge i, create two vertex variables ints:
-u_i and v_i in the range [0,n-1].
-u_i<v_i //lexicographical
-Additionally, for every pair of edges i<j, say u_i<u_j // lexicographical
+u[i] and v[i] in the range [0,n-1].
+u[i]<v[i] //lexicographical and also not equal
+Additionally, for every pair of edges i<j, say u[i]<u[j] // lexicographical
 
-For every pair of edges i<j:
+Also for every pair of edges i<j:
 Verify they don't intersect
+~seg_x_seg(((x[u[i]],y[u[i]])->(x[v[i]],y[v[i]])),((x[u[j]],y[u[j]])->(x[v[j]],y[v[j]])))
+
+for each edge i, create half-edges i and i+m:
+dxdy[i]=(x[u[i]]-x[v[i]],y[u[i]]-y[v[i]])
+dxdy[i+m]=(x[v[i]]-x[u[i]],y[v[i]]-y[u[i]])
+
+Create a permutation of all half-edges, 2m variables a[i]:half-edge->adj_index, i[a]:adj_index->half-edge
+For every adj_index a assign a vertex v[a]:
+for all a: v[a]<=v[a+1]
+don't skip any lists, for all a: v[a+1]<=v[a]+1
+v[0]=0
+v[2m-1]=n-1
+
+Enforce angle contraints:
+for all a<2m-1: (v[a]=v[a+1])=> angle(dxdy[i[a]])<angle(dxdy[i[a+1]]) and angle(dxdy[i[a+1]])-180<=angle(dxdy[i[a]])
+
+Enforce that every node has at least two things adjacent:
+for all a not equal to 0 or 2m-1: v[a]=v[a+1] or v[a]=v[a-1]
+--- edge cases: v[0]=v[1] and v[2m-1]=v[2m-2]
+
+for all vertices v create end[v] and start[v], then add constraints:
+v[end[v]]=v and v[end[v]+1]!=v
+v[start[v]]=v and v[start[v]-1]!=v
+
+for every vertex v: angle(dxdy[i[start[v]]])+180<=angle(dxdy[i[end[v]]])
+
+guarantee that p is even a permutation (maybe unnecessary):
+for any two a, b: i[a] != i[b]
+
+
+
+
+
+
+For every half-edge i: (!start_{i-1}) => ((dx_i,dy_i) at most 180 from (dx_{i-1},dy_{i-1})) and are also in sorted order from 0 degrees
+For every half-edge i: start_{i-1} => end_i
+
+For every pair of half-edges i and j: ((u_i=u_j) and (end_i) and (start_j))=>((dx_i,dy_i) at most 180 from (dx_j,dy_j))
+For every pair of edges i and j: ((p_i=p_j+1) and (
+
+
 
 We have a list of 2m half-edge indeces d_j:
 Every half-edge i in [0,2m-1] (0 to m-1 are u's, m to 2m-1 are v's) and adjanency index j in [0,2m-1]:
 (i == d_j) => 
 
+=====================================
 
 later:
 For each edge i, create an "active" variable
