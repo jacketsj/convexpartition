@@ -47,16 +47,20 @@ for instance in idb:
     if instance.name.find("mona") == -1:
         print(f"Reading solution to {instance.name}")
         #f = open('../min_from_triangulation/'+instance.name+'.out','r')
-        f = open('out/'+instance.name+'.out','r')
-        sys.stdin = f
-        solution = readSolution(instance)
-        solutions.add(solution)
-        sys.stdin = og
-        status = checker(instance=instance, solution=solution)
-        print(status.is_feasible())
-        print(status.get_message())
-        print(status.get_objective_value())
-        vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
+        try:
+            f = open('../out_best/'+instance.name+'.out','r')
+            print(f"-----Found solution to {instance.name}")
+            sys.stdin = f
+            solution = readSolution(instance)
+            solutions.add(solution)
+            sys.stdin = og
+            status = checker(instance=instance, solution=solution)
+            print(status.is_feasible())
+            print(status.get_message())
+            print(status.get_objective_value())
+            #vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
+        except:
+            print("failed")
 
 #instance_loc = "uniform-0000100-2"
 #instance = idb[instance_loc]
@@ -75,7 +79,7 @@ for instance in idb:
 # write solutions into zip
 print("Creating zip. This can take some time...")
 #with SolutionZipWriter("50over30.zip") as zipper:
-with SolutionZipWriter("exp-temperature.zip") as zipper:
+with SolutionZipWriter("temp-jack-5.zip") as zipper:
     zipper.add_solutions(solutions)
 
 #print("You can now upload 'my_first_upload.zip' on",
