@@ -38,7 +38,7 @@ struct annealer {
     //temperature = max(0.L, exp((ld) -3*it / MAXT - 0.5L) + 0.01);//1 - (ld)it / MAXT);
     static const ld EPS = 3;
     //temperature = max(0.05L, 0.4 * exp(-sqr(EPS * ((ld) it / MAXT - 0.5L))));
-    temperature = max(0.02L, 0.4 * exp(-sqr(EPS * ((ld) (atleast0(it-int64_t(80000))) / MAXT - 0.5L))));
+    temperature = max(0.02L, 0.4 * exp(-sqr(EPS * ((ld) (atleast0(it-int64_t(150000))) / MAXT - 0.5L))));
     //temperature = max(0.L, 0.3 * (1 - 4*sqr((ld) it / MAXT - 0.5L)));
   }
 

@@ -22,7 +22,7 @@ void localsearch(graph &g) {
 int main() {
   ifstream in("../base_names.txt");
   //string filename = "mona-lisa-1000000";
-  string filename = "rop0011619";
+  string filename = "euro-night-0060000";
 //  while(in >> filename) {
 //    if (filename < "uniform-0090000-2") continue;
     graph g;
@@ -33,10 +33,10 @@ int main() {
 		localsearch(g);
     int m = g.get_edge_num();
     annealer ann(g);
-		//ann.MAXIT=1000000;
-		//ann.MAXT=400000;
-		ann.MAXIT+=1000000;
-		ann.MAXT+=400000;
+		ann.MAXIT=1000000;
+		ann.MAXT=10000;
+		//ann.MAXIT+=10000;
+		//ann.MAXT+=40000;
     ann.anneal();
     cerr << filename << " started annealing with " << m << " edges and finished with " << g.get_edge_num() <<endl;
 		localsearch(g);
