@@ -21,7 +21,7 @@ def printPoints(instance):
 
 def readSolution(instance):
     n = int(input())
-    solution = Solution(instance=instance.name)
+    solution = Solution(instance=name)
     for i in range(0,n):
         i, x, y = input().split()
         i = int(i)
@@ -41,14 +41,19 @@ og = sys.stdin
 vis = Visualizer()
 checker = SolutionChecker()
 solutions = BestSolutionSet()
-for instance in idb:
+names = open("../base_names.txt")
+#for instance in idb:
+for name in names:
+    name = name[:-1]
     # change this for more instances
     #if len(instance) < 150 and instance.name.find("stars") == -1:
-    if instance.name.find("mona") == -1:
-        print(f"Reading solution to {instance.name}")
-        f = open('../min_from_triangulation/'+instance.name+'.out','r')
+    #if name.find("rop") != -1:
+    if True:
+    #if name.find("rop") != -1 or name.find("ortho") != -1:
+        print(f"Reading solution to {name}")
+        f = open('../best/'+name+'.out','r')
         sys.stdin = f
-        solution = readSolution(instance)
+        solution = readSolution(name)
         solutions.add(solution)
         sys.stdin = og
         #status = checker(instance=instance, solution=solution)
@@ -57,10 +62,12 @@ for instance in idb:
         #print(status.get_objective_value())
         #vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
 
-#instance_loc = "uniform-0000100-2"
+#instance_loc = "rop0000541"
 #instance = idb[instance_loc]
 #
-#solution = readSolution(instance)
+#name = "rop0000541"
+#sys.stdin = open('../min_from_triangulation/'+name+'.out','r')
+#solution = readSolution(name)
 #
 #checker = SolutionChecker()
 #status = checker(instance=instance, solution=solution)
@@ -68,12 +75,14 @@ for instance in idb:
 #print(status.get_message())
 #print(status.get_objective_value())
 #vis = Visualizer()
+#print("visualizing")
 #vis.visualize_solution(solution=solution, instance=instance) # opens plot if possible
+#print("visualized")
 #vis.visualize_solution(solution=solution, instance=instance, path="fig_of_sat_on_" + instance_loc + ".pdf") # writes plot to file
 
 # write solutions into zip
 print("Creating zip. This can take some time...")
-with SolutionZipWriter("exp-temperature.zip") as zipper:
+with SolutionZipWriter("continuous-restart.zip") as zipper:
     zipper.add_solutions(solutions)
 
 #print("You can now upload 'my_first_upload.zip' on",

@@ -276,7 +276,7 @@ struct graph {
     }
     // If we finished reading the graph, initialize things
     init_good_edges();
-    cerr << "DONE READING GRAPH " << filename <<endl;
+    //cerr << "DONE READING GRAPH " << filename <<endl;
   }
 
   void print_matlab() {

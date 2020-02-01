@@ -3,16 +3,11 @@ using namespace std;
 #include "Annealer.h"
 #include "Graph.h"
 #include "ThreadPool.h"
-const int RESTART = 5;
+const int RESTART = 10;
 
 mutex lk;
 unordered_set<string> active;
 unordered_map<string, int> noimprove;
-
-bool can_restart(const string& filename) {
-  return 0;
-  return filename.find("rop") != string::npos;
-}
 
 void run(const string& filename) {
   {
@@ -24,9 +19,10 @@ void run(const string& filename) {
   bool restart = 0;
   {
     lock_guard<mutex> l(lk);
-    if (can_restart(filename) && noimprove[filename] >= RESTART) {
-      cerr << "restarting " << filename << endl;
+    if (noimprove[filename] >= RESTART) {
+      //cerr << "restarting " << filename << endl;
       noimprove[filename] = 0;
+      restart = 1;
     }
   }
   if (restart) {
@@ -39,18 +35,16 @@ void run(const string& filename) {
   annealer ann(g);
   ann.anneal();
   if (g.get_edge_num() < m) {
-    cerr << filename << " started with " << 1+m-g.n << " faces and finished with " << 1+g.get_edge_num()-g.n;
     graph h;
     h.read("../best/"+filename+".out");
     if (h.get_edge_num() > g.get_edge_num()) {
+      cerr << filename << " started with " << 1+m-g.n << " faces and finished with " << 1+g.get_edge_num()-g.n;
       cerr << " new best" << endl;
       g.write("../best/"+filename+".out");
-    } else cerr << endl;
-    if (can_restart(filename)) {
-      lock_guard<mutex> l(lk);
-      noimprove[filename] = 0;
     }
-  } else if (can_restart(filename)) {
+    lock_guard<mutex> l(lk);
+    noimprove[filename] = 0;
+  } else {
     lock_guard<mutex> l(lk);
     noimprove[filename]++;
   }
@@ -62,13 +56,13 @@ void run(const string& filename) {
 }
 
 int main() {
-  ifstream in("../big.txt");
+  ifstream in("../medium.txt");
   string filename = "euro-night-0010000";
-  thread_pool tp(12);
+  thread_pool tp(50);
   vector<string> files;
   while (in >> filename) {
     //if (filename.find("rop") == string::npos && filename.find("paris") == string::npos && filename.find("euro") == string::npos) continue;
-    //if (filename.find("rop") != string::npos || filename.find("ortho") != string::npos) continue;
+    //if (filename.find("rop") == string::npos && filename.find("ortho") == string::npos) continue;
     files.push_back(filename);
   }
   while (1) {

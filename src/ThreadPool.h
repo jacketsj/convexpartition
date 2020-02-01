@@ -4,16 +4,16 @@
 using namespace std;
 
 struct thread_pool {
-  static const int THREAD = 60;
-	static const int SZ = THREAD;
-	thread ts[SZ];
+  static const int QSZ = 10;
+  vector<thread> ts;
 	queue<packaged_task<void()>> q;
 	mutex m;
   condition_variable qempty;
+  condition_variable qfull;
 	bool active;
-	thread_pool() {
+	thread_pool(int threads) {
 		active = 1;
-		auto loop = [&](const int i) {
+		auto loop = [&]() {
 			while (active) {
 				bool has = 0;
 				packaged_task<void()> p;
@@ -24,14 +24,16 @@ struct thread_pool {
 						p = move(q.front());
 						q.pop();
             qempty.notify_one();
+            qfull.notify_one();
 					}
 				}
 				if (has) p();
 				else this_thread::yield();
 			}
 		};
-		for (int i = 0; i < SZ; i++) {
-			ts[i] = thread(bind(loop, i));
+    ts.resize(threads);
+		for (int i = 0; i < threads; i++) {
+			ts[i] = thread(loop);
 		}
 	}
 	void add(packaged_task<void()>&& p) {
