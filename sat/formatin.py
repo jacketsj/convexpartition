@@ -56,11 +56,11 @@ for name in names:
         solution = readSolution(name)
         solutions.add(solution)
         sys.stdin = og
-        #status = checker(instance=instance, solution=solution)
-        #print(status.is_feasible())
-        #print(status.get_message())
-        #print(status.get_objective_value())
-        #vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
+        status = checker(instance=instance, solution=solution)
+        print(status.is_feasible())
+        print(status.get_message())
+        print(status.get_objective_value())
+        vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
 
 #instance_loc = "rop0000541"
 #instance = idb[instance_loc]

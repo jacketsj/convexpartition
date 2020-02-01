@@ -1,0 +1,102 @@
+symbolic edges:
+Denote the points as 0 through n-1
+
+Start with a fixed number of m edges
+For the ith edge edge, create two values a_i and b_i with 0<=a_i,b_i<=n-1.
+Enforce a_i<b_i (for asymmetry and efficiency)
+Also enforce a_{i-1}<a_i (for more efficiency)
+
+Then, we need to encode the constraints:
+- No two edges can intersect
+- Every point must have at least two adjacent edges.
+- the 180 degree rule
+
+
+The adjacency list formuation:
+We keep a list of 2m values, each of which will correspond to a half-edge index.
+We also have n-1 indeces (we might not need these indeces)
+The ith index denotes where the i+1th vertex's adjacency list starts.
+
+Within our formulation of adjacency lists for each point (keep a variable for the degree)
+and also sort by order of angle (which is both more efficient and quite useful)
+Then for each incoming edge to a node,
+assert that the next one (if it exists) is not too far over
+It suffices to asser that angle increases through the big adjacency list,
+except at the points where the next list starts.
+
+To do this last part, we can create values v_first and v_last for each vertex v.
+For v<n-1, v_end+1=(v+1)_start
+of course, (n-1)_end=2m
+
+Problem: how do we enforce angle constraints? How do we even get the appropriate x and y
+We need something like angle_formula(x[val[i]],y[val[i]],x[val[i+1]],y[val[i+1]])
+
+Edge intersection is still n^2. Can we do better?
+Maybe we can formulate the events from bentley-ottmann (or an online algorithm?)
+
+
+===========================================
+n^2 symbolic edge formulation:
+Denote points 0 through n-1
+Start with m edges 0 through m-1.
+
+For each edge i, create two vertex variables ints:
+u[i] and v[i] in the range [0,n-1].
+u[i]<v[i] //lexicographical and also not equal
+Additionally, for every pair of edges i<j, say u[i]<u[j] // lexicographical
+
+Also for every pair of edges i<j:
+Verify they don't intersect
+~seg_x_seg(((x[u[i]],y[u[i]])->(x[v[i]],y[v[i]])),((x[u[j]],y[u[j]])->(x[v[j]],y[v[j]])))
+
+for each edge i, create half-edges i and i+m:
+dxdy[i]=(x[u[i]]-x[v[i]],y[u[i]]-y[v[i]])
+dxdy[i+m]=(x[v[i]]-x[u[i]],y[v[i]]-y[u[i]])
+
+Create a permutation of all half-edges, 2m variables a[i]:half-edge->adj_index, i[a]:adj_index->half-edge
+For every adj_index a assign a vertex v[a]:
+for all a: v[a]<=v[a+1]
+don't skip any lists, for all a: v[a+1]<=v[a]+1
+v[0]=0
+v[2m-1]=n-1
+
+Enforce angle contraints:
+for all a<2m-1: (v[a]=v[a+1])=> angle(dxdy[i[a]])<angle(dxdy[i[a+1]]) and angle(dxdy[i[a+1]])-180<=angle(dxdy[i[a]])
+
+Enforce that every node has at least two things adjacent:
+for all a not equal to 0 or 2m-1: v[a]=v[a+1] or v[a]=v[a-1]
+--- edge cases: v[0]=v[1] and v[2m-1]=v[2m-2]
+
+for all vertices v create end[v] and start[v], then add constraints:
+v[end[v]]=v and v[end[v]+1]!=v
+v[start[v]]=v and v[start[v]-1]!=v
+
+for every vertex v: angle(dxdy[i[start[v]]])+180<=angle(dxdy[i[end[v]]])
+
+guarantee that p is even a permutation (maybe unnecessary):
+for any two a, b: i[a] != i[b]
+
+
+
+
+
+
+For every half-edge i: (!start_{i-1}) => ((dx_i,dy_i) at most 180 from (dx_{i-1},dy_{i-1})) and are also in sorted order from 0 degrees
+For every half-edge i: start_{i-1} => end_i
+
+For every pair of half-edges i and j: ((u_i=u_j) and (end_i) and (start_j))=>((dx_i,dy_i) at most 180 from (dx_j,dy_j))
+For every pair of edges i and j: ((p_i=p_j+1) and (
+
+
+
+We have a list of 2m half-edge indeces d_j:
+Every half-edge i in [0,2m-1] (0 to m-1 are u's, m to 2m-1 are v's) and adjanency index j in [0,2m-1]:
+(i == d_j) => 
+
+=====================================
+
+later:
+For each edge i, create an "active" variable
+a_i.
+a_i=>a_{i-1} (a prefix of the edges are active)
+min sum of a_i

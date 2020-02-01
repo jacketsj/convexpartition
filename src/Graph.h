@@ -27,7 +27,7 @@ struct graph {
   };
   vector<set<int, pt_cmp>> adj;
   set<pair<int,int>> chull_edges;
-  edge_ost good_edges, removable_edges;
+  edge_ost good_edges, removable_edges, inner_edges;
   int edge_cnt;
   ld tot_edge_len;
 
@@ -93,6 +93,7 @@ struct graph {
     adj[j].insert(i);
     edge_cnt++;
     tot_edge_len += sqrt(distsqr(points[i], points[j]));
+    inner_edges.insert({i,j});
     return true;
   }
   void remove_edge(int i, int j, bool update=0) {
@@ -100,12 +101,13 @@ struct graph {
       remove_edge_and_update_status(i, j);
       return;
     }
+    if (i>j) swap(i,j);
     assert(adj[i].count(j));
     assert(adj[j].count(i));
-    if (i>j) swap(i,j);
     adj[i].erase(j);
     adj[j].erase(i);
     edge_cnt--;
+    inner_edges.erase({i,j});
     tot_edge_len -= sqrt(distsqr(points[i], points[j]));
   }
   void reset() {
@@ -146,6 +148,7 @@ struct graph {
     int nex = *adj[mni].begin();
     do {
       chull_edges.insert({min(cur, nex), max(cur, nex)});
+      inner_edges.erase({min(cur, nex), max(cur, nex)});
       int nexnex = halfedge_next(nex, cur);
       tie(cur,nex) = tie(nex, nexnex);
     } while(cur!=mni);
@@ -155,7 +158,9 @@ struct graph {
       vector<int> adji; // cast to vector to avoid iteration problems
       for(int j:adj[i]) adji.push_back(j);
       for(int j:adji) {
-        if (i<j) update_status(i,j);
+        if (i<j) {
+          update_status(i,j);
+        }
       }
     }
   }
@@ -243,18 +248,15 @@ struct graph {
     else return flip(a,b);
   }
 
-  // commented out because unused
-  /*
   bool triangulate_halfedge(int a, int b, int& e1, int& e2) {
     // ensure a->b is a triangle
     if (is_triangle(a,b)) return false;
     int c = halfedge_next(a,b);
     // assert(!adj[b].count(c));
-    add_edge(b, c);
+    if (!add_edge(b, c, 1)) return false;
     e1 = b, e2 = c;
     return true;
   }
-  */
 
   // Functions to load/save graphs
   void read(string filename) { // clear graph and read in new graph
