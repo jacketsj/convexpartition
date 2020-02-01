@@ -5,7 +5,6 @@ using namespace std;
 
 const int INF = 1e9;
 
-map<int, vector<int>> xs;
 
 void triangulate_upper(graph& g, vector<int>& v) {
   vector<int> ch(v.size());
@@ -26,6 +25,7 @@ int main() {
   while(basenames >> base) {
     cerr << "Vertifying " << base << endl;
     graph g;
+    map<int, vector<int>> xs;
     g.read("../in/"+base+".in");
     for(auto &[i, x, y]: g.points) {
       xs[x].push_back(i);
@@ -48,8 +48,7 @@ int main() {
     triangulate_upper(g, upper);
     reverse(lower.begin(), lower.end());
     triangulate_upper(g, lower);
-    g.print_matlab();
+    //g.print_matlab();
     g.write("../verticals/" + base + ".out");
-    return 0;
   }
 }
