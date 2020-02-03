@@ -22,3 +22,13 @@ For the next **n** lines:
 
 For the next **n** lines:
 **k<sub>i</sub> a<sub>1</sub>, a<sub>2</sub>, ... a<sub>k<sub>i</sub></sub>** - number of neighbors for point i, then the index of its neighbours 
+
+# Directory Organization
+
+- in/ contains raw point sets of all the instances. 
+- triangulations/ contains the triangulated point sets of all instances.
+- *.txt files contain base names of instances.
+- src/ contains local search, triangulization code, graph and point struct.
+- sat/ contains Jack's SAT stuff as well as python scripts for printing polyganizations and packaging solutions. (should be moved to src)
+
+
