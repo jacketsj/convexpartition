@@ -19,7 +19,7 @@ struct annealer {
                         g(_g), dis(0.0L, 1.0L) {
     // n log^2 n should be enough whp to visit all edges
     MAXT = min(5e5, 2*g.n*log2(g.n)*log2(g.n));  // Reduced 
-    MAXIT = MAXT+g.n*log(g.n)+100000;
+    MAXIT = MAXT+g.n*log(g.n)+60000;
     temperature = 0;
     success = 0;
   }

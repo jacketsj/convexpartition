@@ -218,6 +218,7 @@ struct graph {
   // directed rotations
   bool can_rot(int a, int b) {
     if (rot_ccw(a, b)) {
+      //cerr << "try can rot " << points[a].x << " " << points[a].y << " " << points[b].x << " " << points[b].y << endl;
       assert(rot_cw(a,b));
       return true;
     }

@@ -49,18 +49,18 @@ for name in names:
     #if len(instance) < 150 and instance.name.find("stars") == -1:
     #if name.find("rop") != -1:
     if True:
-    #if name.find("rop") != -1 or name.find("ortho") != -1:
+    #if name.find("rop") != -1:
         print(f"Reading solution to {name}")
         f = open('../best/'+name+'.out','r')
         sys.stdin = f
         solution = readSolution(name)
         solutions.add(solution)
         sys.stdin = og
-        status = checker(instance=instance, solution=solution)
-        print(status.is_feasible())
-        print(status.get_message())
-        print(status.get_objective_value())
-        vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
+        #status = checker(instance=instance, solution=solution)
+        #print(status.is_feasible())
+        #print(status.get_message())
+        #print(status.get_objective_value())
+        #vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
 
 #instance_loc = "rop0000541"
 #instance = idb[instance_loc]

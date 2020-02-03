@@ -28,7 +28,6 @@ int main() {
     map<int, vector<int>> xs;
     g.read("../in/"+base+".in");
     for(auto &[i, x, y]: g.points) {
-      swap(x,y);
       xs[x].push_back(i);
     }
     vector<int> upper;
@@ -49,9 +48,6 @@ int main() {
     triangulate_upper(g, upper);
     reverse(lower.begin(), lower.end());
     triangulate_upper(g, lower);
-    for(auto &[i, x, y]: g.points) {
-      swap(x,y);
-    }
     //g.print_matlab();
     g.write("../horizontals/" + base + ".out");
   }

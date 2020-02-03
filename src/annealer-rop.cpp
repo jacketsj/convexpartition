@@ -3,7 +3,7 @@ using namespace std;
 #include "Annealer.h"
 #include "Graph.h"
 #include "ThreadPool.h"
-const int RESTART = 10;
+const int RESTART = 4;
 
 mutex lk;
 unordered_set<string> active;
@@ -15,22 +15,32 @@ void run(const string& filename) {
     if (active.count(filename)) return;
     active.insert(filename);
   }
+  mt19937 rng(chrono::high_resolution_clock::now().time_since_epoch().count());
+  //cerr << "run on " << filename << endl;
   graph g;
   bool restart = 0;
   {
     lock_guard<mutex> l(lk);
-    if (noimprove[filename] >= RESTART) {
+    if (noimprove[filename] == RESTART) {
       //cerr << "restarting " << filename << endl;
       noimprove[filename] = 0;
       restart = 1;
     }
   }
   if (restart) {
-    g.read("../triangulations/"+filename+".tri");
+    if (filename.find("rop") != string::npos || rng()%2) {
+      if (rng()%2) {
+        g.read("../verticals/"+filename+".out");
+      } else {
+        g.read("../horizontals/"+filename+".out");
+      }
+    } else {
+      g.read("../triangulations/"+filename+".tri");
+    }
   } else {
     g.read("../min_from_triangulation/"+filename+".out");
   }
-  if (g.n <= 100) return; // file stays in active, so never runs
+  //if (g.n <= 100) return; // file stays in active, so never runs
   int m = g.get_edge_num();
   annealer ann(g);
   ann.anneal();
@@ -56,14 +66,16 @@ void run(const string& filename) {
 }
 
 int main() {
-  ifstream in("../medium.txt");
+  ifstream in("../base_names.txt");
   string filename = "euro-night-0010000";
-  thread_pool tp(50);
+  thread_pool tp(63);
   vector<string> files;
   while (in >> filename) {
     //if (filename.find("rop") == string::npos && filename.find("paris") == string::npos && filename.find("euro") == string::npos) continue;
     //if (filename.find("rop") == string::npos && filename.find("ortho") == string::npos) continue;
+    //if (filename.find("rop") == string::npos) continue;
     files.push_back(filename);
+    //noimprove[filename] = RESTART;
   }
   while (1) {
     //if (filename < "us-night-0000010") continue;
