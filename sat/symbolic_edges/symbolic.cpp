@@ -17,10 +17,15 @@ void encode_smt(int n, const vector<pt> &points, int k)
 	vector<string> u(k), v(k);
 	vector<string> vars;
 	vector<string> assertions;
+
+	auto literal = [](int i) {
+		return string("(_ bv" + to_string(i) + " 64)");
+	};
+
 	for (int i = 0; i < k; ++i)
 	{
-		u[i] = "u_" + i;
-		v[i] = "v_" + i;
+		u[i] = "u_" + to_string(i);
+		v[i] = "v_" + to_string(i);
 		vars.push_back(u[i]);
 		vars.push_back(v[i]);
 		vars.push_back(u[i] + "_x");
@@ -30,7 +35,7 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		// u[i] < v[i], unsigned comparison
 		assertions.push_back("(bvult " + u[i] + ' ' + v[i] + ")");
 		// v[i] < n
-		assertions.push_back("(bvult " + v[i] + " (_ bv64 " + to_string(n) + "))");
+		assertions.push_back("(bvult " + v[i] + " " + literal(n) + ")");
 		// u[i-1] < u[i], unsigned comparison
 		if (i > 0)
 			assertions.push_back("(bvult " + u[i-1] + " " + u[i] + ")");
@@ -39,15 +44,13 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		for (int p = 0; p < points.size(); ++p)
 		{
 			assertions.push_back("(=> (= " + u[i] + " " + to_string(p) + ") "
-					+ "(and (= " + u[i] + "_x (_ bv64 " + to_string(points[p].x) + ")) "
-					+ "(= " + u[i] + "_y (_ bv64 " + to_string(points[p].y) + "))))");
+					+ "(and (= " + u[i] + "_x " + literal(points[p].x) + ") "
+					+ "(= " + u[i] + "_y " + literal(points[p].y) + ")))");
 			assertions.push_back("(=> (= " + v[i] + " " + to_string(p) + ") "
-					+ "(and (= " + v[i] + "_x (_ bv64 " + to_string(points[p].x) + ")) "
-					+ "(= " + v[i] + "_y (_ bv64 " + to_string(points[p].y) + "))))");
+					+ "(and (= " + v[i] + "_x " + literal(points[p].x) + ") "
+					+ "(= " + v[i] + "_y " + literal(points[p].y) + ")))");
 		}
 	}
-
-	cerr << __LINE__ << endl;
 
 	// we use cross products both for intersections and for angle constraints in the adjacency list
 	auto cross = [](const string &x, const string &y, const string &ox, const string &oy) {
@@ -56,7 +59,7 @@ void encode_smt(int n, const vector<pt> &points, int k)
 	// cross product indicates <=180 degrees
 	auto cross_max = [&](const string &x, const string &y, const string &ox, const string &oy) {
 		// signed <=
-		return string("(bvsle " + cross(x,y,ox,oy) + " (_ bv64 0))");
+		return string("(bvsle " + cross(x,y,ox,oy) + literal(0) + ")");
 	};
 
 	// no two lines can intersect
@@ -83,7 +86,7 @@ void encode_smt(int n, const vector<pt> &points, int k)
 			{
 				string prod = "(bvmul " + use_cross(a,b,c) + " " + use_cross(d,b,c) + ")";
 				// signed less than 0
-				return string("(bvslt " + prod + " (_ bv64 0))");
+				return string("(bvslt " + prod + " " + literal(0) + ")");
 			};
 			// variable names by order of appearance
 			string a = u[i];
@@ -94,42 +97,40 @@ void encode_smt(int n, const vector<pt> &points, int k)
 			assertions.push_back(isectray(a,c,d,b));
 		}
 
-	cerr << __LINE__ << endl;
-
 	// create a permutation of all 2k half-edges
 	vector<string> p(2*k);
 	for (int i = 0; i < 2*k; ++i)
 	{
-		p[i] = "p_" + i;
+		p[i] = "p_" + to_string(i);
 		vars.push_back(p[i]);
 		// append _dx and _dy to get vectors
 		vars.push_back(p[i] + "_dx");
 		vars.push_back(p[i] + "_dy");
 		vars.push_back(p[i] + "_v"); // adjacent (closer) vertex
 		// p[i] < 2*k
-		assertions.push_back("(bvult " + p[i] + " (_ bv64 " + to_string(2*k) + "))");
+		assertions.push_back("(bvult " + p[i] + " " + literal(2*k) + ")");
 		// p[i][v] < n
-		assertions.push_back("(bvult " + p[i] + "_v (_ bv64 " + to_string(n) + "))");
+		assertions.push_back("(bvult " + p[i] + "_v " + literal(n) + ")");
 		// define what p_i_dx (signed), p_i_dy (signed), and p_i_v must be
 		for (int j = 0; j < k; ++j)
 		{
-			assertions.push_back("(=> (= " + to_string(j) + " " + p[i] + ") "
+			assertions.push_back("(=> (= " + literal(j) + " " + p[i] + ") "
 					+ "(= (bvsub " + u[j] + "_x " + v[j] + "_x) "
 					+ p[i] + "_dx))");
-			assertions.push_back("(=> (= " + to_string(j) + " " + p[i] + ") "
+			assertions.push_back("(=> (= " + literal(j) + " " + p[i] + ") "
 					+ "(= (bvsub " + u[j] + "_y " + v[j] + "_y) "
 					+ p[i] + "_dy))");
-			assertions.push_back("(=> (= " + to_string(j) + " " + p[i] + ") "
+			assertions.push_back("(=> (= " + literal(j) + " " + p[i] + ") "
 					+ "(= " + v[j] + " " + p[i] + "_v))");
-			assertions.push_back("(=> (= (bvsub " + to_string(j) + " (_ bv64 " + to_string(k) + ")) "
+			assertions.push_back("(=> (= (bvsub " + to_string(j) + " " + literal(k) + ") "
 						+ p[i] + ") "
 					+ "(= (bvsub " + v[j] + "_x " + u[j] + "_x) "
 					+ p[i] + "_dx))");
-			assertions.push_back("(=> (= (bvsub " + to_string(j) + " (_ bv64 " + to_string(k) + ")) "
+			assertions.push_back("(=> (= (bvsub " + to_string(j) + " " + literal(k) + ") "
 						+ p[i] + ") "
 					+ "(= (bvsub " + v[j] + "_y " + u[j] + "_y) "
 					+ p[i] + "_dy))");
-			assertions.push_back("(=> (= (bvsub " + to_string(j) + " (_ bv64 " + to_string(k) + ")) "
+			assertions.push_back("(=> (= (bvsub " + to_string(j) + " " + literal(k) + ") "
 						+ p[i] + ") "
 					+ "(= " + v[j] + " " + p[i] + "_v))");
 		}
@@ -137,7 +138,7 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		{
 			// p_(i-1)_v <= p_i_v, and p_(i-1)_v + 1 >= p_i_v
 			assertions.push_back("(bvule " + p[i-1] + "_v " + p[i] + "_v)");
-			assertions.push_back("(bvuge (" + p[i-1] + "_v " + p[i] + "_v)");
+			assertions.push_back("(bvuge " + p[i-1] + "_v " + p[i] + "_v)");
 			if (i < n-1)
 			{
 				// p_i_v = p_(i-1)_v or p_i_v = p_(i+1)_v (at least two for every vertex)
@@ -154,13 +155,11 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		for (int j = i+1; j < 2*k; ++j)
 			assertions.push_back("(not (= " + p[i] + " " + p[j] + "))");
 
-	cerr << __LINE__ << endl;
-
 	// first two must be v=0, last two must be v=n-1
-	assertions.push_back("(= " + p[0] + "_v (_ bv64 0))");
-	assertions.push_back("(= " + p[1] + "_v (_ bv64 0))");
-	assertions.push_back("(= " + p[2*k-1] + "_v (_ bv64 " + to_string(n-1) + "))");
-	assertions.push_back("(= " + p[2*k-2] + "_v (_ bv64 " + to_string(n-1) + "))");
+	assertions.push_back("(= " + p[0] + "_v " + literal(0) + ")");
+	assertions.push_back("(= " + p[1] + "_v " + literal(0) + ")");
+	assertions.push_back("(= " + p[2*k-1] + "_v " + literal(n-1) + ")");
+	assertions.push_back("(= " + p[2*k-2] + "_v " + literal(n-1) + ")");
 
 	// add the cross product rule for the last to first edge of every adjacency list too
 	for (int i = 0; i < 2*k; ++i)
@@ -168,8 +167,8 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		{
 			if (i > 0 && j < 2*k-1)
 				assertions.push_back("(=> (and (= " + p[i] + "_v " + p[j] + "_v) "
-							+ "(not (= " + p[j] + "_v " + p[j+1] + "_v)) "
-							+ "(not (= " + p[i] + "_v " + p[i-1] + "_v))) "
+							+ "(and (not (= " + p[j] + "_v " + p[j+1] + "_v)) "
+								+ "(not (= " + p[i] + "_v " + p[i-1] + "_v)))) "
 						+ cross_max(p[j] + "_dx", p[j] + "_dy", p[i] + "_dx", p[i] + "_dy") + ")");
 			else if (i > 0)
 				assertions.push_back("(=> (and (= " + p[i] + "_v " + p[j] + "_v) "
@@ -184,8 +183,6 @@ void encode_smt(int n, const vector<pt> &points, int k)
 						+ cross_max(p[j] + "_dx", p[j] + "_dy", p[i] + "_dx", p[i] + "_dy") + ")");
 		}
 
-	cerr << __LINE__ << endl;
-	
 
 	cout << "(set-option :print-success true)" << '\n';
 	cout << "(set-option :pp.bv-literals false)" << '\n'; // change default display to decimal (?)
