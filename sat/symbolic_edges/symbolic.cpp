@@ -30,31 +30,31 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		// u[i] < v[i], unsigned comparison
 		assertions.push_back("(bvult " + u[i] + ' ' + v[i] + ")");
 		// v[i] < n
-		assertions.push_back("(bvult " + v[i] + " (_ bv64 " + n + "))");
+		assertions.push_back("(bvult " + v[i] + " (_ bv64 " + to_string(n) + "))");
 		// u[i-1] < u[i], unsigned comparison
 		if (i > 0)
-			assertions.push_back("(bvult " + u[i-1] + ' ' + u[i] + ")");
+			assertions.push_back("(bvult " + u[i-1] + " " + u[i] + ")");
 
 		// define what u[i]_x, u[i]_y, v[i]_x, and v[i]_y must be
 		for (int p = 0; p < points.size(); ++p)
 		{
-			assertions.push_back("(=> (= " + u[i] + ' ' + p ") "
-					+ "(and (= " + u[i] + "_x (_ bv64 " + points[p].x + ")) "
-					+ "(= " + u[i] + "_y (_ bv64 " + points[p].y + "))))");
-			assertions.push_back("(=> (= " + v[i] + ' ' + p ") "
-					+ "(and (= " + v[i] + "_x (_ bv64 " + points[p].x + ")) "
-					+ "(= " + v[i] + "_y (_ bv64 " + points[p].y + "))))");
+			assertions.push_back("(=> (= " + u[i] + " " + to_string(p) + ") "
+					+ "(and (= " + u[i] + "_x (_ bv64 " + to_string(points[p].x) + ")) "
+					+ "(= " + u[i] + "_y (_ bv64 " + to_string(points[p].y) + "))))");
+			assertions.push_back("(=> (= " + v[i] + " " + to_string(p) + ") "
+					+ "(and (= " + v[i] + "_x (_ bv64 " + to_string(points[p].x) + ")) "
+					+ "(= " + v[i] + "_y (_ bv64 " + to_string(points[p].y) + "))))");
 		}
 	}
 
 	// we use cross products both for intersections and for angle constraints in the adjacency list
 	auto cross = [](const string &x, const string &y, const string &ox, const string &oy) {
-		return "(bvsub (bvmul " + x + ' ' + oy + ") (bvmul " + ox + ' ' + y + "))";
+		return string("(bvsub (bvmul " + x + " " + oy + ") (bvmul " + ox + " " + y + "))");
 	};
 	// cross product indicates <=180 degrees
-	auto cross_max = [](const string &x, const string &y, const string &ox, const string &oy) {
+	auto cross_max = [&](const string &x, const string &y, const string &ox, const string &oy) {
 		// signed <=
-		return "(bvsle " + cross(x,y,ox,oy) + " (_ bv64 0))";
+		return string("(bvsle " + cross(x,y,ox,oy) + " (_ bv64 0))");
 	};
 
 	// no two lines can intersect
@@ -63,7 +63,7 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		{
 			// seg x seg
 			// here we do signed comparisons of everything
-			auto use_cross = [](const string &a, const string &b, const string &c) {
+			auto use_cross = [&](const string &a, const string &b, const string &c) {
 				string ax, ay, bx, by, cx, cy; // how do we get these? just append _x or _y for now
 				ax = a + "_x";
 				ay = a + "_y";
@@ -71,18 +71,18 @@ void encode_smt(int n, const vector<pt> &points, int k)
 				by = b + "_y";
 				cx = c + "_x";
 				cy = c + "_y";
-				string x = "(bvsub " + ax + ' ' + bx + ")";
-				string y = "(bvsub " + ay + ' ' + by + ")";
-				string ox = "(bvsub " + cx + ' ' + bx + ")";
-				string oy = "(bvsub " + cy + ' ' + by + ")";
+				string x = "(bvsub " + ax + " " + bx + ")";
+				string y = "(bvsub " + ay + " " + by + ")";
+				string ox = "(bvsub " + cx + " " + bx + ")";
+				string oy = "(bvsub " + cy + " " + by + ")";
 				return cross(x,y,ox,oy);
-			}
-			auto isectray = [](const string &a, const string &b, const string &c, const string &d)
+			};
+			auto isectray = [&](const string &a, const string &b, const string &c, const string &d)
 			{
-				string prod = "(bvmul " + use_cross(a,b,c) + ' ' + use_cross(d,b,c) + ")";
+				string prod = "(bvmul " + use_cross(a,b,c) + " " + use_cross(d,b,c) + ")";
 				// signed less than 0
-				return "(bvslt " + prod + " (_ bv64 0))";
-			}
+				return string("(bvslt " + prod + " (_ bv64 0))");
+			};
 			// variable names by order of appearance
 			string a = u[i];
 			string b = v[i];
@@ -103,28 +103,31 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		vars.push_back(p[i] + "_dy");
 		vars.push_back(p[i] + "_v"); // adjacent (closer) vertex
 		// p[i] < 2*k
-		assertions.push_back("(bvult " + p[i] + " (_ bv64 " + 2*k + "))");
+		assertions.push_back("(bvult " + p[i] + " (_ bv64 " + to_string(2*k) + "))");
 		// p[i][v] < n
-		assertions.push_back("(bvult " + p[i] + "_v (_ bv64 " + n + "))");
+		assertions.push_back("(bvult " + p[i] + "_v (_ bv64 " + to_string(n) + "))");
 		// define what p_i_dx (signed), p_i_dy (signed), and p_i_v must be
 		for (int j = 0; j < k; ++j)
 		{
-			assertions.push_back("(=> (= " + j + ' ' + p ") "
-					+ "(= (bvsub " + u[i] + "_x " + v[i] + "_x) "
+			assertions.push_back("(=> (= " + to_string(j) + " " + p[i] + ") "
+					+ "(= (bvsub " + u[j] + "_x " + v[j] + "_x) "
 					+ p[i] + "_dx))");
-			assertions.push_back("(=> (= " + j + ' ' + p ") "
-					+ "(= (bvsub " + u[i] + "_y " + v[i] + "_y) "
+			assertions.push_back("(=> (= " + to_string(j) + " " + p[i] + ") "
+					+ "(= (bvsub " + u[j] + "_y " + v[j] + "_y) "
 					+ p[i] + "_dy))");
-			assertions.push_back("(=> (= " + j + ' ' + p ") "
-					+ "(= " + v[i] + ' ' + p[i] + "_v))");
-			assertions.push_back("(=> (= (bvsub " + j + " (_ bv64 " + k + ")) " + p ") "
-					+ "(= (bvsub " + v[i] + "_x " + u[i] + "_x) "
+			assertions.push_back("(=> (= " + to_string(j) + " " + p[i] + ") "
+					+ "(= " + v[j] + " " + p[i] + "_v))");
+			assertions.push_back("(=> (= (bvsub " + to_string(j) + " (_ bv64 " + to_string(k) + ")) "
+						+ p[i] + ") "
+					+ "(= (bvsub " + v[j] + "_x " + u[j] + "_x) "
 					+ p[i] + "_dx))");
-			assertions.push_back("(=> (= (bvsub " + j + " (_ bv64 " + k + ")) " + p ") "
-					+ "(= (bvsub " + v[i] + "_y " + u[i] + "_y) "
+			assertions.push_back("(=> (= (bvsub " + to_string(j) + " (_ bv64 " + to_string(k) + ")) "
+						+ p[i] + ") "
+					+ "(= (bvsub " + v[j] + "_y " + u[j] + "_y) "
 					+ p[i] + "_dy))");
-			assertions.push_back("(=> (= (bvsub " + j + " (_ bv64 " + k + ")) " + p ") "
-					+ "(= " + v[i] + ' ' + p[i] + "_v))");
+			assertions.push_back("(=> (= (bvsub " + to_string(j) + " (_ bv64 " + to_string(k) + ")) "
+						+ p[i] + ") "
+					+ "(= " + v[j] + " " + p[i] + "_v))");
 		}
 		if (i > 0)
 		{
@@ -145,13 +148,13 @@ void encode_smt(int n, const vector<pt> &points, int k)
 	// force it to actually be a permutation (probably unnecessary, but might speed things up?)
 	for (int i = 0; i < 2*k; ++i)
 		for (int j = i+1; j < 2*k; +j)
-			assertions.push_back("(not (= " + p[i] + ' ' + p[j] + "))");
+			assertions.push_back("(not (= " + p[i] + " " + p[j] + "))");
 
 	// first two must be v=0, last two must be v=n-1
 	assertions.push_back("(= " + p[0] + "_v (_ bv64 0))");
 	assertions.push_back("(= " + p[1] + "_v (_ bv64 0))");
-	assertions.push_back("(= " + p[2*k-1] + "_v (_ bv64 " + n-1 + "))");
-	assertions.push_back("(= " + p[2*k-2] + "_v (_ bv64 " + n-1 + "))");
+	assertions.push_back("(= " + p[2*k-1] + "_v (_ bv64 " + to_string(n-1) + "))");
+	assertions.push_back("(= " + p[2*k-2] + "_v (_ bv64 " + to_string(n-1) + "))");
 
 	// add the cross product rule for the last to first edge of every adjacency list too
 	for (int i = 0; i < 2*k; ++i)
@@ -230,21 +233,21 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		cout << "reading from  file" << endl;
-		assert(freopen(("gsat/"+s+".gsat").c_str(),"r",stdin) != NULL);
+		//cout << "reading from  file" << endl;
+		//assert(freopen(("gsat/"+s+".gsat").c_str(),"r",stdin) != NULL);
 
-		vector<vector<int>> adj = read_ch(n,points,k);
-		cout << "writing to out file" << endl;
-		assert(freopen(("gout/"+s+".out").c_str(),"w",stdout) != NULL);
-		cout << n << '\n';
-		for (int i = 0; i < n; ++i)
-			cout << i << ' ' << points[i].x << ' ' << points[i].y << '\n';
-		for (int i = 0; i < n; ++i)
-		{
-			cout << adj[i].size();
-			for (int j : adj[i])
-				cout << ' ' << j;
-			cout << '\n';
-		}
+		//vector<vector<int>> adj = read_ch(n,points,k);
+		//cout << "writing to out file" << endl;
+		//assert(freopen(("gout/"+s+".out").c_str(),"w",stdout) != NULL);
+		//cout << n << '\n';
+		//for (int i = 0; i < n; ++i)
+		//	cout << i << ' ' << points[i].x << ' ' << points[i].y << '\n';
+		//for (int i = 0; i < n; ++i)
+		//{
+		//	cout << adj[i].size();
+		//	for (int j : adj[i])
+		//		cout << ' ' << j;
+		//	cout << '\n';
+		//}
 	}
 }
