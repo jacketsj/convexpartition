@@ -47,6 +47,8 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		}
 	}
 
+	cerr << __LINE__ << endl;
+
 	// we use cross products both for intersections and for angle constraints in the adjacency list
 	auto cross = [](const string &x, const string &y, const string &ox, const string &oy) {
 		return string("(bvsub (bvmul " + x + " " + oy + ") (bvmul " + ox + " " + y + "))");
@@ -91,6 +93,8 @@ void encode_smt(int n, const vector<pt> &points, int k)
 			assertions.push_back(isectray(d,a,b,c));
 			assertions.push_back(isectray(a,c,d,b));
 		}
+
+	cerr << __LINE__ << endl;
 
 	// create a permutation of all 2k half-edges
 	vector<string> p(2*k);
@@ -147,8 +151,10 @@ void encode_smt(int n, const vector<pt> &points, int k)
 	}
 	// force it to actually be a permutation (probably unnecessary, but might speed things up?)
 	for (int i = 0; i < 2*k; ++i)
-		for (int j = i+1; j < 2*k; +j)
+		for (int j = i+1; j < 2*k; ++j)
 			assertions.push_back("(not (= " + p[i] + " " + p[j] + "))");
+
+	cerr << __LINE__ << endl;
 
 	// first two must be v=0, last two must be v=n-1
 	assertions.push_back("(= " + p[0] + "_v (_ bv64 0))");
@@ -177,6 +183,8 @@ void encode_smt(int n, const vector<pt> &points, int k)
 				assertions.push_back("(=> (= " + p[i] + "_v " + p[j] + "_v) "
 						+ cross_max(p[j] + "_dx", p[j] + "_dy", p[i] + "_dx", p[i] + "_dy") + ")");
 		}
+
+	cerr << __LINE__ << endl;
 	
 
 	cout << "(set-option :print-success true)" << '\n';
@@ -211,7 +219,7 @@ int main(int argc, char* argv[])
 	string s = read_problem_file();
 
 	cerr << "reading problem file: " << s << endl;
-	assert(freopen(("../in/"+s+".in").c_str(),"r",stdin) != NULL);
+	assert(freopen(("../../in/"+s+".in").c_str(),"r",stdin) != NULL);
 	int n; cin >> n;
 	vector<pt> points(n);
 	for (int i = 0; i < n; ++i)
@@ -226,7 +234,7 @@ int main(int argc, char* argv[])
 
 	if (!read)
 	{
-		cout << "writing to smt file" << endl;
+		cerr << "writing to smt file" << endl;
 		assert(freopen(("smt/"+s+".smt").c_str(),"w",stdout) != NULL);
 		//encode_ch(n,points,k);
 		encode_smt(n,points,k);
