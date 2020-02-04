@@ -43,10 +43,10 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		// define what u[i]_x, u[i]_y, v[i]_x, and v[i]_y must be
 		for (int p = 0; p < points.size(); ++p)
 		{
-			assertions.push_back("(=> (= " + u[i] + " " + to_string(p) + ") "
+			assertions.push_back("(=> (= " + u[i] + " " + literal(p) + ") "
 					+ "(and (= " + u[i] + "_x " + literal(points[p].x) + ") "
 					+ "(= " + u[i] + "_y " + literal(points[p].y) + ")))");
-			assertions.push_back("(=> (= " + v[i] + " " + to_string(p) + ") "
+			assertions.push_back("(=> (= " + v[i] + " " + literal(p) + ") "
 					+ "(and (= " + v[i] + "_x " + literal(points[p].x) + ") "
 					+ "(= " + v[i] + "_y " + literal(points[p].y) + ")))");
 		}
@@ -100,8 +100,9 @@ void encode_smt(int n, const vector<pt> &points, int k)
 	// create a permutation of all 2k half-edges
 	vector<string> p(2*k);
 	for (int i = 0; i < 2*k; ++i)
-	{
 		p[i] = "p_" + to_string(i);
+	for (int i = 0; i < 2*k; ++i)
+	{
 		vars.push_back(p[i]);
 		// append _dx and _dy to get vectors
 		vars.push_back(p[i] + "_dx");
@@ -122,15 +123,15 @@ void encode_smt(int n, const vector<pt> &points, int k)
 					+ p[i] + "_dy))");
 			assertions.push_back("(=> (= " + literal(j) + " " + p[i] + ") "
 					+ "(= " + v[j] + " " + p[i] + "_v))");
-			assertions.push_back("(=> (= (bvsub " + to_string(j) + " " + literal(k) + ") "
+			assertions.push_back("(=> (= (bvsub " + literal(j) + " " + literal(k) + ") "
 						+ p[i] + ") "
 					+ "(= (bvsub " + v[j] + "_x " + u[j] + "_x) "
 					+ p[i] + "_dx))");
-			assertions.push_back("(=> (= (bvsub " + to_string(j) + " " + literal(k) + ") "
+			assertions.push_back("(=> (= (bvsub " + literal(j) + " " + literal(k) + ") "
 						+ p[i] + ") "
 					+ "(= (bvsub " + v[j] + "_y " + u[j] + "_y) "
 					+ p[i] + "_dy))");
-			assertions.push_back("(=> (= (bvsub " + to_string(j) + " " + literal(k) + ") "
+			assertions.push_back("(=> (= (bvsub " + literal(j) + " " + literal(k) + ") "
 						+ p[i] + ") "
 					+ "(= " + v[j] + " " + p[i] + "_v))");
 		}
@@ -146,7 +147,7 @@ void encode_smt(int n, const vector<pt> &points, int k)
 						+ "(= " + p[i] + "_v " + p[i+1] + "_v))");
 			}
 			// if p_(i-1)_v = p_i_v, then p_(i-1) must have p_i less than 180 degrees away clockwise (?)
-			assertions.push_back("(=> (=" + p[i-1] + "_v " + p[i] + "_v) "
+			assertions.push_back("(=> (= " + p[i-1] + "_v " + p[i] + "_v) "
 					+ cross_max(p[i-1] + "_dx", p[i-1] + "_dy", p[i] + "_dx", p[i] + "_dy") + ")");
 		}
 	}
@@ -184,7 +185,7 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		}
 
 
-	cout << "(set-option :print-success true)" << '\n';
+	//cout << "(set-option :print-success true)" << '\n';
 	cout << "(set-option :pp.bv-literals false)" << '\n'; // change default display to decimal (?)
 
 	for (string &s : vars)
@@ -226,7 +227,7 @@ int main(int argc, char* argv[])
 		points[i] = pt(i,x,y);
 	}
 
-	int k = n-2; // number of convex hulls to try for
+	int k = 21; // number of convex hulls to try for
 	cerr << "using k=" << k << endl;
 
 	if (!read)
