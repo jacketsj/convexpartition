@@ -123,16 +123,16 @@ void encode_smt(int n, const vector<pt> &points, int k)
 					+ p[i] + "_dy))");
 			assertions.push_back("(=> (= " + literal(j) + " " + p[i] + ") "
 					+ "(= " + v[j] + " " + p[i] + "_v))");
-			assertions.push_back("(=> (= (bvsub " + literal(j) + " " + literal(k) + ") "
-						+ p[i] + ") "
+			assertions.push_back("(=> (= (bvsub " + p[i] + " " + literal(k) + ") "
+						+ literal(j) + ") "
 					+ "(= (bvsub " + v[j] + "_x " + u[j] + "_x) "
 					+ p[i] + "_dx))");
-			assertions.push_back("(=> (= (bvsub " + literal(j) + " " + literal(k) + ") "
-						+ p[i] + ") "
+			assertions.push_back("(=> (= (bvsub " + p[i] + " " + literal(k) + ") "
+						+ literal(j) + ") "
 					+ "(= (bvsub " + v[j] + "_y " + u[j] + "_y) "
 					+ p[i] + "_dy))");
-			assertions.push_back("(=> (= (bvsub " + literal(j) + " " + literal(k) + ") "
-						+ p[i] + ") "
+			assertions.push_back("(=> (= (bvsub " + p[i] + " " + literal(k) + ") "
+						+ literal(j) + ") "
 					+ "(= " + v[j] + " " + p[i] + "_v))");
 		}
 		if (i > 0)
