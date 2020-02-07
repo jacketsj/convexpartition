@@ -34,7 +34,7 @@ pair<ll, ll> reduce(ll num, ll dem) {
 mt19937 rng(0x3f);
 
 pair<int, int> find_slope(vector<pt> &v) {
-  int IT = 1e8;
+  int IT = 1e7;
   int n = v.size();
   map<pair<int, int>, int> slopes; //change this to unordered map (hash possibly negative numbers)
   for(int it=0;it<IT;it++) {
@@ -47,7 +47,6 @@ pair<int, int> find_slope(vector<pt> &v) {
   }
   vector<pair<int, pair<int,int>>> vcnt;
   for(auto [h, c]: slopes) {
-    //cerr << h.first << " " << h.second << " " << c <<endl;
     vcnt.emplace_back(c,h);
   }
   sort(vcnt.rbegin(), vcnt.rend());
@@ -63,6 +62,7 @@ int main() {
   string base;
   while(basenames >> base) {
     graph g;
+    if (base.find("paris") == string::npos) continue;
     g.read("../in/"+base+".in");
     vector<pt> points = g.points; // make a copy (this is necessary)
     assert(points.size());
@@ -72,11 +72,14 @@ int main() {
     cerr << "Majorize " << base << " WITH RESPECT TO SLOPE " << a << " / " << b << endl;
     for(auto &[i, x, y]: points) {
       // transform points with same slope {a, b} to have same x
-      // skew translation
+      // rotation
       // suppose (x1 - x2)*b = (y1 - y2)*a
       // Then x1*b - y1*a = x2*b - y2*a
       // x <- xb - ya
-      x = x*b - y*a;
+      // y <- xa + yb
+      ll newx = x*b - y*a;
+      ll newy = x*a + y*b;
+      tie(x,y) = tie(newx, newy);
     }
     map<int, vector<int>> xs;
     for(auto &[i, x, y]: points) {
@@ -101,8 +104,9 @@ int main() {
     triangulate_upper(g, points, upper);
     reverse(lower.begin(), lower.end());
     triangulate_upper(g, points, lower);
-    //g.print_matlab();
+    g.print_matlab();
     g.write("../majorized/" + base + "_" + to_string(a) + "-" + to_string(b) + ".out");
+    return 0;
   }
 }
 
