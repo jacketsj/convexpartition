@@ -5,10 +5,10 @@ using namespace std;
 typedef long double ld;
 
 struct pt {
-  int i, x, y;
+  int64_t i, x, y;
   pt() : i(-1), x(0), y(0) {}
-  pt(int x, int y) : i(-1), x(x), y(y) {}
-  pt(int i, int x, int y) : i(i), x(x), y(y) {}
+  pt(int64_t x, int64_t y) : i(-1), x(x), y(y) {}
+  pt(int i, int64_t x, int64_t y) : i(i), x(x), y(y) {}
   pt operator+(const pt& o) const {
     return pt(x+o.x,y+o.y);
   }
@@ -27,6 +27,9 @@ struct pt {
     return pt(x/d,y/d);
   }
 
+  friend ld cpld(const pt& a, const pt& b) {
+    return (ld)a.x*b.y - (ld)a.y*b.x;
+  }
   friend int64_t cp(const pt& a, const pt& b) {
     return (int64_t)a.x*b.y - (int64_t)a.y*b.x;
   }

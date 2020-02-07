@@ -7,7 +7,7 @@ void triangulate_upper(graph &g, vector<pt> &points, vector<int>& v) {
   vector<int> ch(v.size());
   int top = 0, bot = 1;
   for(int i=0;i<v.size();i++) {
-    while(top > bot && cp(points[ch[top-1]]-points[ch[top-2]], points[v[i]]-points[ch[top-2]]) <= 0) {
+    while(top > bot && cpld(points[ch[top-1]]-points[ch[top-2]], points[v[i]]-points[ch[top-2]]) <= 0) {
       g.add_edge(v[i], ch[top-1]);
       top--;
     }
@@ -62,7 +62,6 @@ int main() {
   string base;
   while(basenames >> base) {
     graph g;
-    if (base.find("paris") == string::npos) continue;
     g.read("../in/"+base+".in");
     vector<pt> points = g.points; // make a copy (this is necessary)
     assert(points.size());
@@ -81,7 +80,7 @@ int main() {
       ll newy = x*a + y*b;
       tie(x,y) = tie(newx, newy);
     }
-    map<int, vector<int>> xs;
+    map<int64_t, vector<int>> xs;
     for(auto &[i, x, y]: points) {
       xs[x].push_back(i);
     }
@@ -104,9 +103,8 @@ int main() {
     triangulate_upper(g, points, upper);
     reverse(lower.begin(), lower.end());
     triangulate_upper(g, points, lower);
-    g.print_matlab();
+    //g.print_matlab();
     g.write("../majorized/" + base + "_" + to_string(a) + "-" + to_string(b) + ".out");
-    return 0;
   }
 }
 
