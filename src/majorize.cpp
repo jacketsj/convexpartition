@@ -102,7 +102,7 @@ int main() {
     reverse(lower.begin(), lower.end());
     triangulate_upper(g, points, lower);
     //g.print_matlab();
-    g.write("../majorized/" + base + ".out");
+    g.write("../majorized/" + base + "_" + to_string(a) + "-" + to_string(b) + ".out");
   }
 }
 

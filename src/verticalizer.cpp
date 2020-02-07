@@ -5,7 +5,6 @@ using namespace std;
 
 const int INF = 1e9;
 
-
 void triangulate_upper(graph& g, vector<int>& v) {
   vector<int> ch(v.size());
   int top = 0, bot = 1;
