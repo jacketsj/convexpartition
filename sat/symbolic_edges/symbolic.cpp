@@ -19,7 +19,7 @@ void encode_smt(int n, const vector<pt> &points, int k)
 	vector<string> assertions;
 
 	auto literal = [](int i) {
-		return string("(_ bv" + to_string(i) + " 64)");
+		return string("(_ bv" + to_string(i) + " 4)");
 	};
 
 	for (int i = 0; i < k; ++i)
@@ -33,12 +33,19 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		vars.push_back(v[i] + "_x");
 		vars.push_back(v[i] + "_y");
 		// u[i] < v[i], unsigned comparison
-		assertions.push_back("(bvult " + u[i] + ' ' + v[i] + ")");
+		assertions.push_back("(bvult " + u[i] + " " + v[i] + ")");
 		// v[i] < n
+		/*
 		assertions.push_back("(bvult " + v[i] + " " + literal(n) + ")");
-		// u[i-1] < u[i], unsigned comparison
+		*/
+		// u[i-1] <= u[i], unsigned comparison, u[i-1] = u[i] => v[i-1] < v[i] === u[i-1] < u[i] or v[i-1] < v[i]
+		/*
 		if (i > 0)
-			assertions.push_back("(bvult " + u[i-1] + " " + u[i] + ")");
+		{
+			assertions.push_back("(bvule " + u[i-1] + " " + u[i] + ")");
+			assertions.push_back("(or (bvult " + u[i-1] + " " + u[i] + ") (bvult " + v[i-1] + " " + v[i] + "))");
+		}
+		*/
 
 		// define what u[i]_x, u[i]_y, v[i]_x, and v[i]_y must be
 		for (int p = 0; p < points.size(); ++p)
@@ -123,23 +130,23 @@ void encode_smt(int n, const vector<pt> &points, int k)
 					+ p[i] + "_dy))");
 			assertions.push_back("(=> (= " + literal(j) + " " + p[i] + ") "
 					+ "(= " + v[j] + " " + p[i] + "_v))");
-			assertions.push_back("(=> (= (bvsub " + p[i] + " " + literal(k) + ") "
-						+ literal(j) + ") "
+			assertions.push_back("(=> (and (bvuge " + p[i] + " " + literal(k) + ") (= (bvsub " + p[i] + " " + literal(k) + ") "
+						+ literal(j) + ")) "
 					+ "(= (bvsub " + v[j] + "_x " + u[j] + "_x) "
 					+ p[i] + "_dx))");
-			assertions.push_back("(=> (= (bvsub " + p[i] + " " + literal(k) + ") "
-						+ literal(j) + ") "
+			assertions.push_back("(=> (and (bvuge " + p[i] + " " + literal(k) + ") (= (bvsub " + p[i] + " " + literal(k) + ") "
+						+ literal(j) + ")) "
 					+ "(= (bvsub " + v[j] + "_y " + u[j] + "_y) "
 					+ p[i] + "_dy))");
-			assertions.push_back("(=> (= (bvsub " + p[i] + " " + literal(k) + ") "
-						+ literal(j) + ") "
-					+ "(= " + v[j] + " " + p[i] + "_v))");
+			assertions.push_back("(=> (and (bvuge " + p[i] + " " + literal(k) + ") (= (bvsub " + p[i] + " " + literal(k) + ") "
+						+ literal(j) + ")) "
+					+ "(= " + u[j] + " " + p[i] + "_v))");
 		}
 		if (i > 0)
 		{
 			// p_(i-1)_v <= p_i_v, and p_(i-1)_v + 1 >= p_i_v
 			assertions.push_back("(bvule " + p[i-1] + "_v " + p[i] + "_v)");
-			assertions.push_back("(bvuge " + p[i-1] + "_v " + p[i] + "_v)");
+			assertions.push_back("(bvuge (bvadd " + p[i-1] + "_v " + literal(1) + ")" + p[i] + "_v)");
 			if (i < n-1)
 			{
 				// p_i_v = p_(i-1)_v or p_i_v = p_(i+1)_v (at least two for every vertex)
@@ -189,10 +196,11 @@ void encode_smt(int n, const vector<pt> &points, int k)
 	cout << "(set-option :pp.bv-literals false)" << '\n'; // change default display to decimal (?)
 
 	for (string &s : vars)
-		cout << "(declare-const " << s << " (_ BitVec 64))" << '\n';
+		cout << "(declare-const " << s << " (_ BitVec 4))" << '\n';
 
+	int r = 0;
 	for (string &s : assertions)
-		cout << "(assert " << s << ")\n";
+		cout << "(assert (! " << s << " :named nam" + to_string(r++) + "))\n";
 
 	cout << "(check-sat)" << '\n';
 
@@ -227,7 +235,7 @@ int main(int argc, char* argv[])
 		points[i] = pt(i,x,y);
 	}
 
-	int k = 21; // number of convex hulls to try for
+	int k = 3; // number of convex hulls to try for
 	cerr << "using k=" << k << endl;
 
 	if (!read)
