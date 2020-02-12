@@ -118,7 +118,7 @@ bool seg_x_seg(cpt a1, cpt a2, cpt b1, cpt b2) {
 } //change to < to exclude endpoints
 bool pt_x_seg(const cpt& p, const cpt& a, const cpt& b)
 {
-	return cp(b-a,p-a) == 0 && dp(p-a,b-a) > 0 && dp(p-b,a-b) > 0;
+	return abs(cp(b-a,p-a))<EPS && dp(p-a,b-a) > 0 && dp(p-b,a-b) > 0;
 }
 }
 
@@ -220,6 +220,7 @@ void print_wcnf(int m, vector<vector<int>> ors, vector<vector<int>> nands,
 	for (auto i : nots)
 	{
 		cout << required << ' ';
+		//cout << i << ' ';
 		cout << '-' << i << ' ';
 		cout << "0\n";
 	}
@@ -291,7 +292,10 @@ int main()
 		}
 		for (int j = 0; j < n; ++j)
 			if (edges[i].ln.isect(points[j]))
+			{
 				nots.push_back(edges[i].e_index);
+				break;
+			}
 	}
 
 	for (int v = 0; v < n; ++v)
