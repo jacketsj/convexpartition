@@ -116,6 +116,10 @@ bool seg_x_seg(cpt a1, cpt a2, cpt b1, cpt b2) {
 	}
 	return s1*s2 < 0 && s3*s4 < 0;
 } //change to < to exclude endpoints
+bool pt_x_seg(const cpt& p, const cpt& a, const cpt& b)
+{
+	return cp(b-a,p-a) == 0 && dp(p-a,b-a) > 0 && dp(p-b,a-b) > 0;
+}
 }
 
 struct linseg
@@ -136,6 +140,10 @@ struct linseg
 		//auto c = o.a, d = o.b;
 		//return ((d-a).cross(b-a)) * ((c-a).cross(b-a)) < 0
 		//	&& ((a-c).cross(d-c)) * ((b-c).cross(d-c)) < 0;
+	}
+	bool isect(const pt &p) const
+	{
+		return ubc::pt_x_seg(ubc::convert(p),ubc::convert(a),ubc::convert(b));
 	}
 };
 
@@ -190,7 +198,8 @@ void print_cnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
 	}
 }
 
-void print_wcnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
+void print_wcnf(int m, vector<vector<int>> ors, vector<vector<int>> nands,
+		vector<int> nots)
 {
 	int required = m + 1;
 	cout << "p wcnf " << m << ' ' << ors.size()+nands.size() << ' ' << required << '\n';
@@ -206,6 +215,12 @@ void print_wcnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
 		cout << required << ' ';
 		for (auto i : vi)
 			cout << '-' << i << ' ';
+		cout << "0\n";
+	}
+	for (auto i : nots)
+	{
+		cout << required << ' ';
+		cout << '-' << i << ' ';
 		cout << "0\n";
 	}
 	for (int i = 1; i <= m; ++i)
@@ -254,8 +269,10 @@ int main()
 		sort(adj[i].begin(),adj[i].end());
 	}
 	vector<vector<int>> nands, ors;
-	//temporary, to be replaced with bentley-ottmann
+	vector<int> nots;
+	// line intersection
 	for (int i = 0; i < m; ++i)
+	{
 		for (int j = i+1; j < m; ++j)
 		{
 			if (edges[i].ln.isect(edges[j].ln))
@@ -272,6 +289,10 @@ int main()
 				}
 			}
 		}
+		for (int j = 0; j < n; ++j)
+			if (edges[i].ln.isect(points[j]))
+				nots.push_back(edges[i].e_index);
+	}
 
 	for (int v = 0; v < n; ++v)
 	{
@@ -311,7 +332,7 @@ int main()
 	assert(freopen(("cnf/"+s+".cnf").c_str(),"w",stdout) != NULL);
 
 	//print_cnf(m,ors,nands);
-	print_wcnf(m,ors,nands);
+	print_wcnf(m,ors,nands,nots);
 }
 
 //delta debugging

@@ -4,22 +4,58 @@
 #include "../../src/extern/delaunator.hpp"
 using namespace std;
 
+// TODO remove constraints on convex hull
+
+typedef int64_t T;
+
+T area2(pt a, pt b, pt c)
+{
+	return cp(a,b) + cp(b,c) + cp(c,a);
+}
+
+vector<bool> convex_hull(vector<pt> pts) {
+	int n = pts.size();
+  sort(pts.begin(), pts.end());
+  pts.erase(unique(pts.begin(), pts.end()), pts.end());
+  vector<pt> up, dn;
+  for (int i = 0; i < pts.size(); i++) {
+    while (up.size() > 1 && area2(up[up.size()-2], up.back(), pts[i]) >= 0)
+			up.pop_back();
+    while (dn.size() > 1 && area2(dn[dn.size()-2], dn.back(), pts[i]) <= 0)
+			dn.pop_back();
+    up.push_back(pts[i]);
+    dn.push_back(pts[i]);
+  }
+  pts = dn;
+  for (int i = (int) up.size() - 2; i >= 1; i--)
+		pts.push_back(up[i]);
+	// filter the points
+	vector<bool> ans(n);
+	for (pt p : pts)
+		ans[p.i] = true;
+	// TODO: which edges are on the convex hull?
+	return ans;
+}
+
 string read_problem_file()
 {
 	string s; cin >> s;
 	return s;
 }
 
-void encode_smt(int n, const vector<pt> &points, int k)
+const int bitvecsz = 8;
+
+void encode_smt(int n, const vector<pt> &points, int k, const vector<bool> &ch_verts)
 {
 	// k edges
 	// n nodes
 	vector<string> u(k), v(k);
 	vector<string> vars;
+	vector<string> bools;
 	vector<string> assertions;
 
 	auto literal = [](int i) {
-		return string("(_ bv" + to_string(i) + " 4)");
+		return string("(_ bv" + to_string(i) + " " + to_string(bitvecsz) + ")");
 	};
 
 	for (int i = 0; i < k; ++i)
@@ -115,6 +151,7 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		vars.push_back(p[i] + "_dx");
 		vars.push_back(p[i] + "_dy");
 		vars.push_back(p[i] + "_v"); // adjacent (closer) vertex
+		bools.push_back(p[i] + "_ch"); // is p[i][v] on the convex hull?
 		// p[i] < 2*k
 		assertions.push_back("(bvult " + p[i] + " " + literal(2*k) + ")");
 		// p[i][v] < n
@@ -122,6 +159,14 @@ void encode_smt(int n, const vector<pt> &points, int k)
 		// define what p_i_dx (signed), p_i_dy (signed), and p_i_v must be
 		for (int j = 0; j < k; ++j)
 		{
+			// define what _ch must be
+			if (ch_verts[j])
+				assertions.push_back("(=> (= " + literal(j) + " " + p[i] + ") "
+						+ p[i] + "_ch)");
+			else
+				assertions.push_back("(=> (= " + literal(j) + " " + p[i] + ") (not "
+						+ p[i] + "_ch))");
+
 			assertions.push_back("(=> (= " + literal(j) + " " + p[i] + ") "
 					+ "(= (bvsub " + u[j] + "_x " + v[j] + "_x) "
 					+ p[i] + "_dx))");
@@ -155,7 +200,7 @@ void encode_smt(int n, const vector<pt> &points, int k)
 			}
 			// if p_(i-1)_v = p_i_v, then p_(i-1) must have p_i less than 180 degrees away clockwise (?)
 			assertions.push_back("(=> (= " + p[i-1] + "_v " + p[i] + "_v) "
-					+ cross_max(p[i-1] + "_dx", p[i-1] + "_dy", p[i] + "_dx", p[i] + "_dy") + ")");
+					+ "(or " + p[i] + "_ch " + cross_max(p[i-1] + "_dx", p[i-1] + "_dy", p[i] + "_dx", p[i] + "_dy") + "))");
 		}
 	}
 	// force it to actually be a permutation (probably unnecessary, but might speed things up?)
@@ -173,22 +218,24 @@ void encode_smt(int n, const vector<pt> &points, int k)
 	for (int i = 0; i < 2*k; ++i)
 		for (int j = i+1; j < 2*k; ++j)
 		{
+			// TODO do not have these constraints if _v is in the convex hull
 			if (i > 0 && j < 2*k-1)
 				assertions.push_back("(=> (and (= " + p[i] + "_v " + p[j] + "_v) "
 							+ "(and (not (= " + p[j] + "_v " + p[j+1] + "_v)) "
 								+ "(not (= " + p[i] + "_v " + p[i-1] + "_v)))) "
-						+ cross_max(p[j] + "_dx", p[j] + "_dy", p[i] + "_dx", p[i] + "_dy") + ")");
+						+ "(or " + p[i] + "_ch " + cross_max(p[j] + "_dx", p[j] + "_dy", p[i] + "_dx", p[i] + "_dy") + "))");
 			else if (i > 0)
 				assertions.push_back("(=> (and (= " + p[i] + "_v " + p[j] + "_v) "
 							+ "(not (= " + p[i] + "_v " + p[i-1] + "_v))) "
-						+ cross_max(p[j] + "_dx", p[j] + "_dy", p[i] + "_dx", p[i] + "_dy") + ")");
+						+ "(or " + p[i] + "_ch " + cross_max(p[j] + "_dx", p[j] + "_dy", p[i] + "_dx", p[i] + "_dy") + "))");
 			else if (j < 2*k-1)
 				assertions.push_back("(=> (and (= " + p[i] + "_v " + p[j] + "_v) "
 							+ "(not (= " + p[j] + "_v " + p[j+1] + "_v))) "
-						+ cross_max(p[j] + "_dx", p[j] + "_dy", p[i] + "_dx", p[i] + "_dy") + ")");
+						+ "(or " + p[i] + "_ch " + cross_max(p[j] + "_dx", p[j] + "_dy", p[i] + "_dx", p[i] + "_dy") + "))");
 			else
 				assertions.push_back("(=> (= " + p[i] + "_v " + p[j] + "_v) "
-						+ cross_max(p[j] + "_dx", p[j] + "_dy", p[i] + "_dx", p[i] + "_dy") + ")");
+						+ "(or " + p[i] + "_ch " + cross_max(p[j] + "_dx", p[j] + "_dy", p[i] + "_dx", p[i] + "_dy") + "))");
+			// TODO: add constraint for the 0 degree angle for both of these
 		}
 
 
@@ -196,7 +243,10 @@ void encode_smt(int n, const vector<pt> &points, int k)
 	cout << "(set-option :pp.bv-literals false)" << '\n'; // change default display to decimal (?)
 
 	for (string &s : vars)
-		cout << "(declare-const " << s << " (_ BitVec 4))" << '\n';
+		cout << "(declare-const " << s << " (_ BitVec " + to_string(bitvecsz) + "))" << '\n';
+
+	for (string &s : bools)
+		cout << "(declare-const " << s << " Bool)" << '\n';
 
 	int r = 0;
 	for (string &s : assertions)
@@ -235,6 +285,10 @@ int main(int argc, char* argv[])
 		points[i] = pt(i,x,y);
 	}
 
+	// find which points are on the convex hull
+	// could also find which edges, but does not right now
+	vector<bool> ch_verts = convex_hull(points);
+
 	int k = 3; // number of convex hulls to try for
 	cerr << "using k=" << k << endl;
 
@@ -243,7 +297,7 @@ int main(int argc, char* argv[])
 		cerr << "writing to smt file" << endl;
 		assert(freopen(("smt/"+s+".smt").c_str(),"w",stdout) != NULL);
 		//encode_ch(n,points,k);
-		encode_smt(n,points,k);
+		encode_smt(n,points,k,ch_verts);
 	}
 	else
 	{
