@@ -43,12 +43,14 @@ checker = SolutionChecker()
 solutions = BestSolutionSet()
 for instance in idb:
     # change this for more instances
-    #if len(instance) < 50 and len(instance) >= 30 and instance.name.find("stars") == -1:
-    if instance.name.find("mona") == -1:
+    if len(instance) <= 300:
+    #and len(instance) >= 30 and instance.name.find("stars") == -1:
+    #if instance.name.find("mona") == -1:
         print(f"Reading solution to {instance.name}")
         #f = open('../min_from_triangulation/'+instance.name+'.out','r')
         try:
-            f = open('../out_best/'+instance.name+'.out','r')
+            f = open('out/'+instance.name+'.out','r')
+            #f = open('../out_best/'+instance.name+'.out','r')
             print(f"-----Found solution to {instance.name}")
             sys.stdin = f
             solution = readSolution(instance)
@@ -79,7 +81,7 @@ for instance in idb:
 # write solutions into zip
 print("Creating zip. This can take some time...")
 #with SolutionZipWriter("50over30.zip") as zipper:
-with SolutionZipWriter("temp-jack-7.zip") as zipper:
+with SolutionZipWriter("sat-jack-8.zip") as zipper:
     zipper.add_solutions(solutions)
 
 #print("You can now upload 'my_first_upload.zip' on",

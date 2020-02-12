@@ -48,12 +48,13 @@ og = sys.stdout
 
 def runOn(instance):
     print("Solving " + instance.name)
-    subprocess.run("UWrMaxSat-1.0/bin/uwrmaxsat -m cnf/" + instance.name + ".cnf -v0 -cpu-lim=30 > sat/" + instance.name + ".sat",shell=True)
+    subprocess.run("UWrMaxSat-1.0/bin/uwrmaxsat -m cnf/" + instance.name + ".cnf -v0 -cpu-lim=500 > sat/" + instance.name + ".sat",shell=True)
     print("Solved " + instance.name)
 
 for instance in idb:
     print("Considering " + instance.name)
-    if len(instance) >= 30 and len(instance) < 50:
+    #if len(instance) >= 50 and len(instance) <= 300:
+    if len(instance) == 101:
         runOn(instance)
 
 # compute the triangulation for all instances

@@ -45,7 +45,7 @@ def runOn(instance):
     print(f"Reading solution to {instance.name}")
     #f = open('out/'+instance.name+'.out','r')
     #f = open('../min_from_triangulation/'+instance.name+'.out','r')
-    f = open('../min_from_triangulation/'+instance.name+'.out','r')
+    f = open('out/'+instance.name+'.out','r')
     sys.stdin = f
     solution = readSolution(instance)
     solutions.add(solution)
@@ -59,7 +59,8 @@ def runOn(instance):
 
 #instance_loc = "stars-0000020"
 #instance_loc = "euro-night-0000020"
-instance_loc = "ortho_rect_union_713"
+#instance_loc = "uniform-0000015-2"
+instance_loc = "rop0000101"
 instance = idb[instance_loc]
 runOn(instance)
 

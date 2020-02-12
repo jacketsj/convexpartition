@@ -173,7 +173,11 @@ int main()
 	//{
 	//	//cin >> sat;
 	//}
-	while (sat != "v" && cin >> sat) {};
+	do
+	{
+		cin >> sat;
+	}
+	while (sat != "v" && cin);
 	assert(sat=="v");
 
 	// find which edges are included in the solution

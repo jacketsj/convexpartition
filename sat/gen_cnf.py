@@ -51,7 +51,7 @@ def runOn(instance):
 
 for instance in idb:
     print("Considering " + instance.name)
-    if len(instance) < 150:
+    if len(instance) == 101:
         runOn(instance)
 
 # compute the triangulation for all instances

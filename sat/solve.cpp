@@ -55,6 +55,69 @@ struct pt
 	}
 };
 
+// some code from the UBC code archive
+namespace ubc {
+typedef long double ld;
+#define EPS 1e-7
+template<class T> struct cplx {
+  T x, y; cplx() {x = 0.0; y = 0.0;}
+  cplx(T nx, T ny=0) {x = nx; y = ny;}
+  cplx operator+(const cplx &c) const {return {x + c.x, y + c.y};}
+  cplx operator-(const cplx &c) const {return {x - c.x, y - c.y};}
+  cplx operator*(const cplx &c) const {return {x*c.x - y*c.y, x*c.y + y*c.x};}
+  cplx& operator*=(const cplx &c) { return *this={x*c.x-y*c.y, x*c.y+y*c.x}; }
+  // Only supports right scalar multiplication like p*c
+  template<class U> cplx operator*(const U &c) const {return {x*c,y*c};}
+  template<class U> cplx operator/(const U &c) const {return {x/c,y/c};} };
+#define polar(r,a)  (cpt){r*cos(a),r*sin(a)}
+typedef cplx<ld> cpt;
+typedef vector<cpt> pol;
+cpt operator*(ld c, const cpt p) { return {p.x*c,p.y*c};} // for left mult. c*p
+// useful for debugging
+ostream&operator<<(ostream &o,const cpt &p){o<<"("<<p.x<<","<<p.y<<")";return o;}
+ld cp(const cpt& a, const cpt& b) { return a.x*b.y - b.x*a.y; }
+ld dp(const cpt& a, const cpt& b) { return a.x*b.x + a.y*b.y; }
+inline ld abs(const cpt &a) {return sqrt(a.x*a.x + a.y*a.y);}
+inline ld arg(const cpt &a) {return atan2(a.y,a.x);}
+ld ang(cpt &a, cpt &b, cpt &c) { return atan2(cp(a-b,b-c),dp(a-b,b-c)); }
+namespace std{
+template<class T>inline bool operator<(const cplx<T>& a,const cplx<T>& b){
+  return a.x<b.x || (a.x == b.x && a.y<b.y); } };
+inline bool cmp_lex(const cpt& a, const cpt& b) {
+  return a.x<b.x-EPS||(a.x<b.x+EPS&&a.y<b.y-EPS);}
+inline bool cmp_lex_i(const cpt& a, const cpt& b) {
+  return a.y<b.y-EPS||(a.y<b.y+EPS&&a.x<b.x-EPS);}
+cpt convert(const pt &a)
+{
+	return cpt(a.x, a.y);
+}
+cpt conj(const cpt &a)
+{
+	return cpt(a.x,-a.y);
+}
+// dist(const cpt& a, const cpt& b) ==> abs(a-b)
+inline bool eq(const cpt &a, const cpt &b) { return abs(a-b) < EPS; }
+inline ld sgn(const ld& x) { return abs(x) < EPS ? 0 : x/abs(x); }
+bool seg_x_seg(cpt a1, cpt a2, cpt b1, cpt b2) {
+	if (eq(a1,a2) || eq(b1,b2))
+		return false; // uncomment to exclude endpoints
+	ld za = abs(a2-a1), zb = abs(b2-b1);
+	za=za>EPS?1/za:0; zb=zb>EPS?1/zb:0;
+	int s1 = sgn(cp(a2-a1, b1-a1)*za), s2 = sgn(cp(a2-a1, b2-a1)*za);
+	int s3 = sgn(cp(b2-b1, a1-b1)*zb), s4 = sgn(cp(b2-b1, a2-b1)*zb);
+	if(!s1 && !s2 && !s3)
+	{ // collinear
+	  if (cmp_lex(a2, a1))
+			swap(a1, a2);
+		if (cmp_lex(b2, b1))
+			swap(b1, b2);
+	  return cmp_lex(a1, b2) && cmp_lex(b1, a2);//uncomment to exclude endpoints
+	  return !cmp_lex(b2, a1) && !cmp_lex(a2, b1);
+	}
+	return s1*s2 < 0 && s3*s4 < 0;
+} //change to < to exclude endpoints
+}
+
 struct linseg
 {
 	pt a, b;
@@ -68,10 +131,11 @@ struct linseg
 	}
 	bool isect(const linseg &o) const
 	{
-		//return isectray(o) && o.isectray(*this);
-		auto c = o.a, d = o.b;
-		return ((d-a).cross(b-a)) * ((c-a).cross(b-a)) < 0
-			&& ((a-c).cross(d-c)) * ((b-c).cross(d-c)) < 0;
+		return ubc::seg_x_seg(ubc::convert(a),ubc::convert(b),ubc::convert(o.a),ubc::convert(o.b));
+		////return isectray(o) && o.isectray(*this);
+		//auto c = o.a, d = o.b;
+		//return ((d-a).cross(b-a)) * ((c-a).cross(b-a)) < 0
+		//	&& ((a-c).cross(d-c)) * ((b-c).cross(d-c)) < 0;
 	}
 };
 
