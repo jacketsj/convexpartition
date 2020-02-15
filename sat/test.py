@@ -9,6 +9,9 @@ from cgshop2020_pyutils import SolutionChecker, Visualizer
 from cgshop2020_pyutils import Solution, Instance, Edge
 sys.stdout = sys.__stdout__
 
+# to run subprocess.run
+import subprocess
+
 # load challenge instances
 idb = InstanceDatabase(os.path.join(os.path.dirname(__file__), ".././challenge_instances"))
 
@@ -42,9 +45,16 @@ checker = SolutionChecker()
 solutions = BestSolutionSet()
 
 def runOn(instance):
+    print("Trying to gen for " + instance.name)
+    subprocess.run("echo \""+instance.name+"\" | ./solve",shell=True)
+    print("Done " + instance.name)
+    print("Solving " + instance.name)
+    subprocess.run("UWrMaxSat-1.0/bin/uwrmaxsat -m cnf/" + instance.name + ".cnf -v0 -cpu-lim=500 > sat/" + instance.name + ".sat",shell=True)
+    print("Solved " + instance.name)
+    print("Reading .sat for " + instance.name)
+    subprocess.run("echo \""+instance.name+"\" | ./read_sln",shell=True)
+    print("Done .out for " + instance.name)
     print(f"Reading solution to {instance.name}")
-    #f = open('out/'+instance.name+'.out','r')
-    #f = open('../min_from_triangulation/'+instance.name+'.out','r')
     f = open('out/'+instance.name+'.out','r')
     sys.stdin = f
     solution = readSolution(instance)
@@ -55,39 +65,12 @@ def runOn(instance):
     print(status.get_message())
     print(status.get_objective_value())
     vis.visualize_solution(solution=solution, instance=instance) # opens plot if possible
-    #vis.visualize_solution(solution=solution,instance=instance,path="pdf/"+instance.name+".pdf")
 
-#instance_loc = "stars-0000020"
+subprocess.run("g++ -O2 -o solve solve.cpp",shell=True)
+#instance_loc = "stars-0000050"
 #instance_loc = "euro-night-0000020"
 #instance_loc = "uniform-0000015-2"
 instance_loc = "rop0000101"
+#instance_loc = "us-night-0000060"
 instance = idb[instance_loc]
 runOn(instance)
-
-#solutions = BestSolutionSet()
-#for instance in idb:
-#    # change this for more instances
-#    if len(instance) < 150 and instance.name.find("euro-night-0000020") != -1:
-#        runOn(instance)
-
-#instance_loc = "uniform-0000100-2"
-#instance = idb[instance_loc]
-#
-#solution = readSolution(instance)
-#
-#checker = SolutionChecker()
-#status = checker(instance=instance, solution=solution)
-#print(status.is_feasible())
-#print(status.get_message())
-#print(status.get_objective_value())
-#vis = Visualizer()
-#vis.visualize_solution(solution=solution, instance=instance) # opens plot if possible
-#vis.visualize_solution(solution=solution, instance=instance, path="fig_of_sat_on_" + instance_loc + ".pdf") # writes plot to file
-
-# write solutions into zip
-#print("Creating zip. This can take some time...")
-#with SolutionZipWriter("some_with_sat.zip") as zipper:
-#    zipper.add_solutions(solutions)
-
-#print("You can now upload 'my_first_upload.zip' on",
-      #"https://cgshop.ibr.cs.tu-bs.de/competition/cg-shop-2020/")
