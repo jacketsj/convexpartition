@@ -1,3 +1,7 @@
+/*
+	This code generates an O(n^4) size SAT formulation for n points.
+	It works (and is very fast) for all instances of size <=50.
+*/
 #include <bits/stdc++.h>
 #include "../src/Graph.h"
 #include "../src/Point.h"
