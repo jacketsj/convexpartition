@@ -2,7 +2,7 @@
 This repository contains the source code of Team UBC in [CG:SHOP 2020,
 the SoCG 2020 Competition](https://cgshop.ibr.cs.tu-bs.de/competition/cg-shop-2020/).
 
-There are three different completed solvers, by decreasing order of power for solving this problem:
+There are three different completed solvers, by decreasing order of success for solving this problem:
 - A simulated annealing-based local search solver.
 - A SAT formulation.
 - A formulation for the Geometry library in MonoSAT.
