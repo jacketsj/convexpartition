@@ -1,6 +1,12 @@
+/*
+	This code generates input for the Geometry solver in MonoSAT
+	(https://github.com/sambayless/monosat/tree/geometry-support)
+
+	However, it is much slower than even the n^4 SAT formulation.
+*/
+
 #include <bits/stdc++.h>
 #include "../src/Point.h"
-//#include "../src/Graph.h"
 #include "../src/extern/delaunator.hpp"
 using namespace std;
 
