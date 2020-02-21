@@ -5,36 +5,13 @@
 */
 #include <bits/stdc++.h>
 #include "../Point.h"
+#include "segments.h"
 using namespace std;
 
 #define int long long
 
 typedef int num;
 typedef long double fl;
-
-struct linseg
-{
-	pt a, b;
-	linseg(pt a, pt b) : a(a), b(b) {}
-	linseg(num x1, num y1, num x2, num y2) : a(pt(x1,y1)), b(pt(x2,y2)) {}
-};
-
-struct edge
-{
-	linseg ln;
-	int e_index;
-	edge(pt a, pt b, int e) : ln(a,b), e_index(e) {}
-	pt vec() const
-	{
-		return ln.b-ln.a;
-	}
-	void print() const
-	{
-		cerr << "edge: e_index=" << e_index
-			<< ", a=(" << ln.a.x << ',' << ln.a.y << "),"
-			<< ", b=(" << ln.b.x << ',' << ln.b.y << ")," << '\n';
-	}
-};
 
 string read_problem_file()
 {

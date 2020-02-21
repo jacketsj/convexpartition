@@ -7,6 +7,8 @@
 using namespace std;
 
 #define int long long
+typedef int num;
+typedef long double fl;
 using ld = long double;
 
 // some code from the UBC Sports Programming Club code archive
