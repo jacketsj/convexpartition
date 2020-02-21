@@ -1,4 +1,10 @@
+/*
+	This code corresponds to sat_formulation.cpp,
+	allowing one to read the output of the SAT solver.
+	Running this code will require out/ and sat/ folders present in the local directory.
+*/
 #include <bits/stdc++.h>
+#include "../Point.h"
 using namespace std;
 
 #define int long long
@@ -6,73 +12,11 @@ using namespace std;
 typedef int num;
 typedef long double fl;
 
-struct pt
-{
-	int i;
-	num x, y;
-	pt() : i(-1), x(0), y(0) {}
-	pt(num x, num y) : i(-1), x(x), y(y) {}
-	pt(int i, num x, num y) : i(i), x(x), y(y) {}
-	pt subtract(const pt &o) const
-	{
-		return pt(x-o.x,y-o.y);
-	}
-	pt operator-(const pt &o) const
-	{
-		return subtract(o);
-	}
-	num normsqr() const
-	{
-		return x*x+y*y;
-	}
-	num distsqr(const pt &o) const
-	{
-		return subtract(o).normsqr();
-	}
-	//pt normalize() const
-	//{
-	//	ld ds = sqrt(normsqr());
-	//	assert(ds!=0);
-	//	return pt(x/ds,y/ds);
-	//}
-	fl angle(const pt &o) const
-	{
-		//pt n = subtract(o).normalize();
-		pt n = subtract(o);
-		return atan2(n.y,n.x);
-	}
-	fl angle() const
-	{
-		return angle(pt(0,0));
-	}
-	num cross(const pt &o) const
-	{
-		return x*o.y-o.x*y;
-	}
-	num dot(const pt &o) const
-	{
-		return x*o.x+y*o.y;
-	}
-};
-
 struct linseg
 {
 	pt a, b;
 	linseg(pt a, pt b) : a(a), b(b) {}
 	linseg(num x1, num y1, num x2, num y2) : a(pt(x1,y1)), b(pt(x2,y2)) {}
-	bool isectray(const linseg &o) const
-	{
-		return ((b.x-a.x)*(o.a.y-b.y)-(b.y-a.y)*(o.a.x-b.x))
-			* ((b.x-a.x)*(o.b.y-b.y)-(b.y-a.y)*(o.b.x-b.x))
-			< 0;
-	}
-	bool isect(const linseg &o) const
-	{
-		//return isectray(o) && o.isectray(*this);
-		auto c = o.a, d = o.b;
-		return ((d-a).cross(b-a)) * ((c-a).cross(b-a)) < 0
-			&& ((a-c).cross(d-c)) * ((b-c).cross(d-c)) < 0;
-	}
 };
 
 struct edge
@@ -82,24 +26,7 @@ struct edge
 	edge(pt a, pt b, int e) : ln(a,b), e_index(e) {}
 	pt vec() const
 	{
-		//return ln.a-ln.b;
 		return ln.b-ln.a;
-	}
-	fl angle() const
-	{
-		return vec().angle();
-	}
-	bool operator<(const edge &other) const
-	{
-		return angle() < other.angle();
-	}
-	bool to_the_left(const edge &other) const
-	{
-		fl a1 = angle(), a2 = other.angle();
-		fl diff = a1-a2;
-		while(diff < 0)
-			diff += 2*M_PI;
-		return diff <= M_PI;
 	}
 	void print() const
 	{
@@ -109,29 +36,9 @@ struct edge
 	}
 };
 
-void print_cnf(int m, vector<vector<int>> ors, vector<vector<int>> nands)
-{
-	cout << "p cnf " << m << ' ' << ors.size()+nands.size() << '\n';
-	for (auto &vi : ors)
-	{
-		for (auto i : vi)
-			cout << i << ' ';
-		cout << "0\n";
-	}
-	for (auto &vi : nands)
-	{
-		for (auto i : vi)
-			cout << '-' << i << ' ';
-		cout << "0\n";
-	}
-}
-
 string read_problem_file()
 {
 	string s; cin >> s;
-	//for (char &c : s)
-	//	if (c == '-')
-	//		c = '.';
 	return s;
 }
 

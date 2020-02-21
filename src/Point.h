@@ -12,12 +12,27 @@ struct pt {
   pt operator+(const pt& o) const {
     return pt(x+o.x,y+o.y);
   }
+	pt subtract(const pt& o) const {
+    return pt(x-o.x,y-o.y);
+	}
   pt operator-(const pt& o) const {
     return pt(x-o.x,y-o.y);
   }
   bool operator<(const pt& o) const {
     return tie(y, x) < tie(o.y, o.x);
   }
+  bool operator==(const pt& o) const {
+    return tie(y, x) == tie(o.y, o.x);
+  }
+	ld angle(const pt &o) const
+	{
+		pt n = subtract(o);
+		return atan2(n.y,n.x);
+	}
+	ld angle() const
+	{
+		return angle(pt(0,0));
+	}
   int64_t normsqr() const {
     int64_t a(x), b(y);
     return b*b+a*a;

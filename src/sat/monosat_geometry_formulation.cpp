@@ -3,11 +3,14 @@
 	(https://github.com/sambayless/monosat/tree/geometry-support)
 
 	However, it is much slower than even the n^4 SAT formulation.
+
+	Running this program will require gnf/ gsat/ and gout/ folders present
+	in the local directory.
 */
 
 #include <bits/stdc++.h>
-#include "../src/Point.h"
-#include "../src/extern/delaunator.hpp"
+#include "../Point.h"
+#include "../extern/delaunator.hpp"
 using namespace std;
 
 string read_problem_file()
@@ -254,7 +257,7 @@ int main(int argc, char* argv[])
 	string s = read_problem_file();
 
 	cout << "reading problem file: " << s << endl;
-	assert(freopen(("../in/"+s+".in").c_str(),"r",stdin) != NULL);
+	assert(freopen(("../../in/"+s+".in").c_str(),"r",stdin) != NULL);
 	int n; cin >> n;
 	vector<pt> points(n);
 	for (int i = 0; i < n; ++i)
