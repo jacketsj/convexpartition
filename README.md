@@ -14,6 +14,8 @@ In addition, there is also an imcomplete symbolic edge constraint solving formul
 - MonoSAT: https://www.cs.ubc.ca/labs/isd/Projects/monosat/
 - cgshop2020-pyutils: `pip install cgshop2020-pyutils` (https://pypi.org/project/cgshop2020-pyutils/)
 
+In addition, a MaxSAT solver is requireed for the simple SAT formulation.
+
 # Instance format
 
 CG:SHOP 2020 used a [JSON-based instance format](https://cgshop.ibr.cs.tu-bs.de/competition/cg-shop-2020/instance-format).
@@ -48,4 +50,4 @@ For the next **n** lines:
 - triangulations/ contains the triangulated point sets of all instances.
 - \*.txt files contain base names of instances.
 - src/ contains local search, triangulization code, graph and point struct, as well as the afformentioned python scripts for generating and parsing IO.
-- src/sat/ contains all contraint solving formulations.
+- src/sat/ contains all contraint solving formulations, and some additional tools to use them.
