@@ -107,5 +107,3 @@ int main() {
     g.write("../majorized/" + base + "_" + to_string(a) + "-" + to_string(b) + ".out");
   }
 }
-
-

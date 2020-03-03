@@ -35,6 +35,10 @@ struct graph {
     return edge_cnt;
   }
 
+	bool has_edge(int a, int b) {
+		return adj[a].count(b) > 0;
+	}
+
   // MUST call this function after ADDING/REMOVING edges
   void update_status(int a, int b) {
     if (a>b) swap(a, b);
