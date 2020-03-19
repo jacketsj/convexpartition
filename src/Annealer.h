@@ -14,12 +14,11 @@ struct annealer {
   int64_t it, MAXT, MAXIT, success;
   ld temperature;
   int64_t flip_cnt, add_cnt, remove_cnt;
+  ld T; // TL in seconds
 
-  annealer(graph& _g) : rng(chrono::high_resolution_clock::now().time_since_epoch().count()), 
-                        g(_g), dis(0.0L, 1.0L) {
+  annealer(graph& _g, ld t) : rng(chrono::high_resolution_clock::now().time_since_epoch().count()), 
+                        g(_g), dis(0.0L, 1.0L), T(t) {
     // n log^2 n should be enough whp to visit all edges
-    MAXT = min(5e5, 2*g.n*log2(g.n)*log2(g.n));  // Reduced 
-    MAXIT = MAXT+g.n*log(g.n)+60000;
     temperature = 0;
     success = 0;
   }
@@ -27,8 +26,8 @@ struct annealer {
   void update_temperature() {
     // should start and end low
     //temperature = max(0.L, exp((ld) -3*it / MAXT - 0.5L) + 0.01);//1 - (ld)it / MAXT);
-    static const ld EPS = 3;
-    temperature = max(0.05L * min(1.L, (ld) it / MAXT), 0.3 * exp(-sqr(EPS * ((ld) it / MAXT - 0.5L))));
+    //static const ld EPS = 3;
+    //temperature = max(0.05L * min(1.L, (ld) it / MAXT), 0.3 * exp(-sqr(EPS * ((ld) it / MAXT - 0.5L))));
     //temperature = max(0.L, 0.3 * (1 - 4*sqr((ld) it / MAXT - 0.5L)));
     //temperature = 0.02;
   }
@@ -96,9 +95,17 @@ struct annealer {
   }
   
   void anneal() {
-    static const int64_t PRINT_ITER = 1e6;
+    //static const int64_t PRINT_ITER = 1e6;
     //cerr << "ANNEALING FOR " << MAXIT << " iterations" <<endl;
-    for(it=1;it<=MAXIT;it++) { // run some extra steps for safety
+    static const int CLOCK_ITER = 1e2;
+    auto start = std::chrono::high_resolution_clock::now();
+    for(it=1;;it++) { // run some extra steps for safety
+      if (it % CLOCK_ITER == 0) {
+        std::chrono::duration<double> diff = std::chrono::high_resolution_clock::now()-start;
+        if (diff.count() >= T) {
+          break;
+        }
+      }
       //if (it % PRINT_ITER == 0) cerr << "ANNEALING PROGRESS " << (ld) it / MAXIT << " TEMP = " << temperature << " SUCCESS% = " << (ld) success / it << endl;
       update_temperature();
       anneal_step();
